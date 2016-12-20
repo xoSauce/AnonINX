@@ -17,8 +17,9 @@ def send_pk(msg, destination):
 	import socket
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect((ip, port))
-	s.send(msg)
-	data = s.recv(1024)
+	print (msg)
+	s.send(msg.encode())
+	data = s.recv(1024).decode()
 	s.close()
 	return data
 
