@@ -1,4 +1,5 @@
 import threading
+from binascii import unhexlify
 
 class Broker():
 	def __init__(self):
@@ -11,6 +12,7 @@ class Broker():
 			public_key_name = 'pk'
 			id_name = 'id'
 			if public_key_name in data and id_name in data:
+				data[id_name] = unhexlify(data[id_name])
 				self.public_keys.update({data[id_name]:data[public_key_name]}) 
 		finally:
 			self.lock.release()
