@@ -4,7 +4,7 @@ from sphinxmix.SphinxParams import SphinxParams
 # The minimal PKI involves names of nodes and keys
 from sphinxmix.SphinxNode import Nenc
 from sphinxmix.SphinxClient import pki_entry
-from epspvt_utils import getIp
+from epspvt_utils import getIp, RequestType
 from binascii import hexlify, unhexlify
 import sys
 import argparse
@@ -35,8 +35,11 @@ def prepare_sending_pk(public_key, server_config):
 		else:
 			import json
 			public_key_in_utf8 = {
-				'id': hexlify(public_key[0]).decode('utf-8'),
-				'pk': public_key[2].__str__()
+				'type': RequestType.publish_data.value,
+				'payload': {
+					'id': hexlify(public_key[0]).decode('utf-8'),
+					'pk': public_key[2].__str__()
+				}
 			}
 			data_string = json.dumps(public_key_in_utf8)
 			return (data_string, {'ip':ip, 'port':int(port), 'file_path': file})
