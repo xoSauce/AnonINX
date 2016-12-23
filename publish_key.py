@@ -34,11 +34,16 @@ def prepare_sending_pk(public_key, server_config):
 			raise ValueError("Server: {} cannot be reached. The key was not published".format(ip))
 		else:
 			import json
+			### This is how to retreive back the EC2Point export
+			# debug_data = hexlify(public_key[2].export()).decode('utf-8')
+			# print (public_key[2].export())
+			# print (unhexlify(debug_data.encode()))
+			###
 			public_key_in_utf8 = {
 				'type': RequestType.publish_data.value,
 				'payload': {
 					'id': hexlify(public_key[0]).decode('utf-8'),
-					'pk': public_key[2].__str__()
+					'pk': hexlify(public_key[2].export()).decode('utf-8')
 				}
 			}
 			data_string = json.dumps(public_key_in_utf8)

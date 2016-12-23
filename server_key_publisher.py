@@ -11,6 +11,7 @@ class Broker():
 		try:
 			public_key_name = 'pk'
 			id_name = 'id'
+			print(data)
 			if public_key_name in data and id_name in data:
 				data[id_name] = unhexlify(data[id_name])
 				self.public_keys.update({data[id_name]:data[public_key_name]}) 
