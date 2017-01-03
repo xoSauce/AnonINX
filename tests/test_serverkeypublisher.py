@@ -1,5 +1,9 @@
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, myPath + '/../')
+
 from binascii import hexlify
-from epspvt import server_key_publisher as skp
+import server_key_publisher as skp
 from threading import Thread, Lock
 
 def test_broker_single_register():
