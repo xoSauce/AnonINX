@@ -5,7 +5,7 @@ class Broker():
 	def __init__(self):
 		self.public_keys = {}
 		self.lock = threading.Lock()
-
+		
 	def register(self, data):
 		self.lock.acquire()
 		try:

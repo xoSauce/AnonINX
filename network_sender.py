@@ -3,7 +3,7 @@ import socket
 class NetworkSender():
 	def __init__(self):
 		pass
-	def send_pk(self, msg, destination):
+	def send_data(self, msg, destination):
 		ip = destination['ip']
 		port = destination['port']
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

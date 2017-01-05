@@ -1,4 +1,5 @@
-import mix
+from mix import MixNode
+from mixnode_listener import MixNodeListener
 import argparse
 
 def parse():
@@ -12,9 +13,11 @@ def parse():
 
 def main():
 	server_config = parse()
-	mixNode = mix.MixNode(server_config)
+	mixNode = MixNode(server_config)
 	response = mixNode.publish_key()
-	return response
+	print (response)
+	mixNodeListener = MixNodeListener(8081, mixNode)
+	mixNodeListener.listen()
 
 if __name__ == '__main__':
 	main()
