@@ -1,9 +1,9 @@
 from sphinxmix.SphinxParams import SphinxParams	
 from sphinxmix.SphinxNode import sphinx_process
 from sphinxmix.SphinxClient import pki_entry, Nenc
-from epspvt_utils import getIp, RequestType
-from binascii import hexlify, unhexlify
+from epspvt_utils import getIp
 from network_sender import NetworkSender
+from request_creator import RequestCreator
 import sys
 import os
 
@@ -31,29 +31,20 @@ class MixNode():
 			self.public_key = public_key
 
 		def prepare_sending_pk(public_key, server_config):
-			ip = server_config['pkserver']
+			key_server_ip = server_config['pkserver']
 			file = server_config['file']
 			port = server_config['port']
 			try:
-				response = os.system("ping -c 1 " + ip)
+				response = os.system("ping -c 1 " + key_server_ip)
 				if response != 0:
 					raise ValueError("Server: {} cannot be reached. The key was not published".format(ip))
 				else:
-					import json
-					### This is how to retreive back the EC2Point export
-					# debug_data = hexlify(public_key[2].export()).decode('utf-8')
-					# print (public_key[2].export())
-					# print (unhexlify(debug_data.encode()))
-					###
-					public_key_in_utf8 = {
-						'type': RequestType.publish_data.value,
-						'payload': {
-							'id': hexlify(public_key[0]).decode('utf-8'),
-							'pk': hexlify(public_key[2].export()).decode('utf-8')
-						}
-					}
-					data_string = json.dumps(public_key_in_utf8)
-					return (data_string, {'ip':ip, 'port':int(port), 'file_path': file})
+					request_creator = RequestCreator()
+					json_data, destination = request_creator.post_key_request(
+						{'ip':key_server_ip, 'port':port},
+						{'id':public_key[0], 'pk':public_key[2]}
+					)
+					return (json_data, destination)
 			except Exception as error:
 				print("Unexpected error: {}".format(error))
 				return None

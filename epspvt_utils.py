@@ -1,10 +1,5 @@
 import requests
-from enum import Enum
-
-class RequestType(Enum):
-    publish_data = 1
-    request_data = 2
-
+#
 def getIp():
 	_RESPONSE_RETURNED = 200
 	link = "https://api.ipify.org?format=json"

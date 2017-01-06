@@ -1,7 +1,7 @@
 import socket
 import json
 from generic_listener import GenericListener
-from epspvt_utils import RequestType
+from request_creator import RequestType
 from mix import MixNode
 from threading import Thread
 

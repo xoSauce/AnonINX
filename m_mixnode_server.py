@@ -12,8 +12,8 @@ def parse():
 	return args
 
 def main():
-	server_config = parse()
-	mixNode = MixNode(server_config)
+	broker_config = parse()
+	mixNode = MixNode(broker_config)
 	response = mixNode.publish_key()
 	print (response)
 	mixNodeListener = MixNodeListener(8081, mixNode)

@@ -3,7 +3,7 @@ import json
 from generic_listener import GenericListener
 from threading import Thread
 from broker import Broker
-from epspvt_utils import RequestType
+from request_creator import RequestType
 
 class Worker(Thread):
 	def __init__(self, socket, address, broker):
@@ -20,8 +20,8 @@ class Worker(Thread):
 			self.sock.send(b'Key will be published.')
 			print(self.broker.get_cache())
 		elif data['type'] == RequestType.request_data.value:
-			pk = self.broker.get_cache_entry(data['payload'])
-			self.broker.send(pk.encode())
+			data = self.broker.fetch(data['payload'])
+			self.sock.send(json.dumps(data).encode())
 
 class KeyListener(GenericListener):
 
