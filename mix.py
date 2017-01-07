@@ -1,11 +1,11 @@
+import sys
+import os
 from sphinxmix.SphinxParams import SphinxParams	
 from sphinxmix.SphinxNode import sphinx_process
 from sphinxmix.SphinxClient import pki_entry, Nenc
 from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
-import sys
-import os
 
 class MixNode():
 

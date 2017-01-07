@@ -5,6 +5,7 @@ import json
 class RequestType(Enum):
 	    publish_data = 1
 	    request_data = 2
+	    push_to_mix = 3 
 
 class RequestCreator():
 
@@ -20,6 +21,22 @@ class RequestCreator():
 		serialized_destination = {
 			'ip':source['ip'],
 			'port': int(source['port'])
+		}
+		return (data_string, serialized_destination)
+
+	def post_msg_to_mix(self, destination, data):
+		request = {
+			'type': RequestType.push_to_mix.value,
+			'payload': {
+				'header_0': hexlify(data['header'][0].export()).decode('utf-8'),
+				'header_1': hexlify(data['header'][1]).decode('utf-8'),
+				'delta': hexlify(data['delta']).decode('utf-8')
+			}
+		}
+		data_string = json.dumps(request)
+		serialized_destination = {
+			'ip': destination['ip'],
+			'port': int(destination['port'])
 		}
 		return (data_string, serialized_destination)
 
