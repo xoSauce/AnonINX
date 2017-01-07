@@ -1,7 +1,7 @@
 from sphinxmix.SphinxParams import SphinxParams	
 from sphinxmix.SphinxNode import sphinx_process
 from sphinxmix.SphinxClient import pki_entry, Nenc
-from epspvt_utils import getIp
+from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
 import sys
@@ -13,7 +13,7 @@ class MixNode():
 		self.private_key = None
 		self.public_key = None
 		self.ip = None
-		self.params = SphinxParams()
+		self.params = getGlobalSphinxParams()
 		self.network_sender = NetworkSender()
 		self.broker_config = broker_config
 
@@ -21,12 +21,11 @@ class MixNode():
 
 		def keyGenerate(params):
 			#This getIp() potentially needs to be reworked
-			ip = self.getIp()
-			nid = Nenc(ip)
+			ip = self.getIp().encode()
 			x = params.group.gensecret()
 			y = params.group.expon(params.group.g, x)
-			private_key = pki_entry(nid, x, y)
-			public_key = pki_entry(nid, None, y)
+			private_key = pki_entry(ip, x, y)
+			public_key = pki_entry(ip, None, y)
 			self.private_key = private_key
 			self.public_key = public_key
 
@@ -64,9 +63,8 @@ class MixNode():
 	
 	def getIp(self):
 		if self.ip is None:
-			self.ip = getIp()
-		else:
-			return self.ip
+			self.ip = getPublicIp()
+		return self.ip
 
 	def process_mix(self, header, delta, cb = None):
 		private_key = self.getPrivateKey()

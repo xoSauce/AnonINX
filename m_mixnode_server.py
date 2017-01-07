@@ -8,14 +8,12 @@ def parse():
 	parser.add_argument('pkserver', help = "Specify the public IP address of the server where public keys will be stored.")
 	parser.add_argument('port', help="Specify the port where the server is listening for connections")
 	args = parser.parse_args()
-	print (args)
 	return args
 
 def main():
 	broker_config = parse()
 	mixNode = MixNode(broker_config)
 	response = mixNode.publish_key()
-	print (response)
 	mixNodeListener = MixNodeListener(8081, mixNode)
 	mixNodeListener.listen()
 

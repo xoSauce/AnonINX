@@ -29,7 +29,6 @@ class RequestCreator():
 		# print (public_key[2].export())
 		# print (unhexlify(debug_data.encode()))
 		###
-
 		public_key_in_utf8 = {
 			'type': RequestType.publish_data.value,
 			'payload': {
