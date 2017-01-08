@@ -18,19 +18,20 @@ class Worker(Thread):
 
 	def run(self):
 		##### TODO -- fix this -- reconstruct object
-		def reconstruct_header(h_0, h_1):
+		def reconstruct_header(h_0, h_1, h_2):
 			h_0 = unhexlify(h_0)
 			params = getGlobalSphinxParams()
 			group = params.group.G
 			ecPt = EcPt.from_binary(h_0, group)
-			return (ecPt, h_1)
+			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
 		data = json.loads(self.sock.recv(4096).decode())
 		if data['type'] == RequestType.push_to_mix.value:
 			data = data['payload']
-			header = reconstruct_header(data['header_0'], data['header_1'])
-			delta = data['delta']
-			self.mixnode.
+			header = reconstruct_header(data['header_0'], data['header_1'], data['header_2'])
+			delta = unhexlify(data['delta'])
+			self.mixnode.process(header, delta)
+
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):
 		super().__init__(port)

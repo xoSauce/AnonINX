@@ -2,7 +2,7 @@ import sys
 import os
 from sphinxmix.SphinxParams import SphinxParams	
 from sphinxmix.SphinxNode import sphinx_process
-from sphinxmix.SphinxClient import pki_entry, Nenc
+from sphinxmix.SphinxClient import pki_entry, PFdecode, Relay_flag, Dest_flag, receive_forward
 from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
@@ -66,17 +66,17 @@ class MixNode():
 			self.ip = getPublicIp()
 		return self.ip
 
-	def process_mix(self, header, delta, cb = None):
+	def process(self, header, delta, cb = None):
 		private_key = self.getPrivateKey()
-		ret = sphinx_process(self.params, self.getPrivateKey(), header, delta)
+		ret = sphinx_process(self.params, self.getPrivateKey().x, header, delta)
 		(tag, info, (header, delta)) = ret
 		routing = PFdecode(self.params, info)
+		print(routing)
 		if routing[0] == Relay_flag:
 		    flag, addr = routing
-		    print (addr)	 
+		    print ('Address:', addr)	 
 		elif routing[0] == Dest_flag:
+			return receive_forward(self.params, delta)
 			#Used currently for testing
 			if cb is not None:
 				cb()
-			#assert receive_forward(params, delta) == [dest, message]
-
