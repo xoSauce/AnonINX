@@ -50,7 +50,7 @@ class MixNode():
 			return None
 
 		keyGenerate(self.params)
-		json_data, destination = prepare_sending_pk(self.getPublicKey(), vars(self.broker_config))
+		json_data, destination = prepare_sending_pk(self.getPublicKey(), self.broker_config)
 		#publish key
 		response = self.network_sender.send_data(json_data, destination)
 		return response

@@ -20,7 +20,7 @@ class Worker(Thread):
 		##### TODO -- fix this -- reconstruct object
 		def reconstruct_header(h_0, h_1):
 			h_0 = unhexlify(h_0)
-			h_1 = unhexlify(h_1)
+			h_1 = unhexlify(h_1.decode('utf-8'))
 			params = getGlobalSphinxParams()
 			group = params.group.G
 			ecPt = EcPt.from_binary(h_0, group)
