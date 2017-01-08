@@ -6,6 +6,7 @@ import time
 
 env.use_ssh_config = True
 env.env_directory = 'ENV'
+env.latest_dir = '/home/%s/itPIR/latest'
 env.user ='ec2-user'
 env.code_dir = '/home/%s/itPIR' % env.user
 env.repo = 'https://github.com/xoSauce/Lower-Cost-epsilon-Private-Information-Retrieval.git'
@@ -31,9 +32,23 @@ def mix_hosts():
         , 'mix-node5'
     ]
 
+def mix_1():
+    env.hosts = ['mix-node1']
+
 def keybroker_host():
     env.hosts = ['key-broker']
 
+def start_mix_listener(ip, port):
+    try:
+        port = int(port)
+        import re
+        pattern = re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
+        if not pattern.match(ip):
+            return False
+        with cd(env.latest_dir):
+            run('python3 m_mixnode_server.py %s %s' % (ip, port))
+    except ValueError:
+        return False
 
 def deploy():
     define_permissions()
@@ -42,7 +57,17 @@ def deploy():
     update_permissions()
     create_venv()
     run_pip()
+    copy_latest()
 
+def copy_latest():
+
+    with settings(warn_only=True):
+        with cd(env.code_dir):
+            run("mkdir -p %s" % env.latest_dir)
+        with cd("%s/releases/" % (env.code_dir)):
+            directory = run("ls -td -- */ | head -n 1")
+            with cd(directory):
+                run("cp -r * ../../%s" % (env.latest_dir))
 
 def system_dependencies():
     sudo('yum install -y openssl-devel')
