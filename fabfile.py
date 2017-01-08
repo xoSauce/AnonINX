@@ -5,14 +5,6 @@ from fabric.contrib.console import confirm
 import time
 
 env.use_ssh_config = True
-env.hosts = [
-#'key-broker'
-#, 'mix-node1'
-'mix-node2'
-, 'mix-node3'
-, 'mix-node4'
-, 'mix-node5']
-
 env.env_directory = 'ENV'
 env.user ='ec2-user'
 env.code_dir = '/home/%s/itPIR' % env.user
@@ -20,6 +12,28 @@ env.repo = 'https://github.com/xoSauce/Lower-Cost-epsilon-Private-Information-Re
 env.timestamp = "release_%s" % int(time.time() * 1000)
 env.activate = "source %s/releases/%s/%s/bin/activate" % (env.code_dir, env.timestamp, env.env_directory)
 #timestamp="release_%s" % int(time.time() * 1000)
+def all_hosts():
+    env.hosts = [
+        'key-broker'
+        , 'mix-node1'
+        , 'mix-node2'
+        , 'mix-node3'
+        , 'mix-node4'
+        , 'mix-node5'
+    ]
+
+def mix_hosts():
+    env.hosts = [
+        'mix-node1'
+        , 'mix-node2'
+        , 'mix-node3'
+        , 'mix-node4'
+        , 'mix-node5'
+    ]
+
+def keybroker_host():
+    env.hosts = ['key-broker']
+
 
 def deploy():
     define_permissions()
@@ -60,7 +74,7 @@ def virtualenv():
 def run_pip():
     with virtualenv():
         with cd("%s/releases/%s/" % (env.code_dir, env.timestamp)):
-            run('pip3.5 install -r requirements.txt')
+            run('pip3.5 install -r requirements.txt --ignore-installed')
             run('pip freeze')
 
 def define_permissions():
