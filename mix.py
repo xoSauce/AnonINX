@@ -74,7 +74,8 @@ class MixNode():
 		print(routing)
 		if routing[0] == Relay_flag:
 		    flag, addr = routing
-		    print ('Address:', addr)	 
+		    print(addr)
+			return (addr, None)	 
 		elif routing[0] == Dest_flag:
 			return receive_forward(self.params, delta)
 			#Used currently for testing

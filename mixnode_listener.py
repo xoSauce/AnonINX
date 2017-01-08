@@ -30,7 +30,14 @@ class Worker(Thread):
 			data = data['payload']
 			header = reconstruct_header(data['header_0'], data['header_1'], data['header_2'])
 			delta = unhexlify(data['delta'])
-			self.mixnode.process(header, delta)
+			result = self.mixnode.process(header, delta)
+			if result[1] is None:
+				json_data, dest = RequestCreator().post_msg_to_mix(
+					{'ip': addr, 'port': mix_port},
+					{'header': header, 'delta': delta}
+				)
+				self.network_sender.send_data(json_data, dest)
+
 
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):
