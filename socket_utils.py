@@ -12,7 +12,7 @@ def recv_timeout(the_socket,timeout=2):
         elif time.time()-begin > timeout*2:
             break
         try:
-            data = the_socket.recv(8192)
+            data = the_socket.recv(8192).decode()
             if data:
                 total_data.append(data)
                 begin = time.time()
