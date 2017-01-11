@@ -58,6 +58,6 @@ class MixNodeListener(GenericListener):
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()
-				Worker(clientsocket, address, self.mixnode, port)
+				Worker(clientsocket, address, self.mixnode, self.port)
 		finally:
 			self.serversocket.close()
