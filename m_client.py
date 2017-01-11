@@ -7,6 +7,7 @@ from request_creator import RequestCreator
 from network_sender import NetworkSender
 from epspvt_utils import getGlobalSphinxParams, Debug
 from petlib.ec import EcPt
+from logger import *
 
 class Client:
 	def __init__(self, public_key_server):
@@ -56,7 +57,8 @@ class Client:
 				'ip': self.public_key_server['ip'],
 				'port': self.public_key_server['port']
 		})
-
+		if len(mixnodes_dict) == 0:
+			raise Exception("There are no mix-nodes available.")
 		message = b'This is a test'
 		dest = b'Bob'
 
@@ -70,8 +72,6 @@ class Client:
 	
 		if Debug.dbg is True:
 			dest['ip'] = b'0.0.0.0'
-
-		print(dest)
 		self.network_sender.send_data(json_data, dest)
 		
 		
@@ -83,10 +83,10 @@ def parse():
 	parser.add_argument('pkserver', help = "Specify the public IP address of the server where public keys will be stored.")
 	parser.add_argument('port', help="Specify the port where the server is listening for connections")
 	args = parser.parse_args()
-	print (args)
 	return args
 
 def main():
+	log_init("m_client.log")
 	args = vars(parse())
 	
 	if args['debug']:

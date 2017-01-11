@@ -25,7 +25,6 @@ class RequestCreator():
 		return (data_string, serialized_destination)
 
 	def post_msg_to_mix(self, destination, data):
-		print (data['header'])
 		request = {
 			'type': RequestType.push_to_mix.value,
 			'payload': {

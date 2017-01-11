@@ -6,8 +6,8 @@ import time
 
 env.use_ssh_config = True
 env.env_directory = 'ENV'
-env.latest_dir = '/home/%s/itPIR/latest'
-env.user ='ec2-user'
+env.user ='ubuntu'
+env.latest_dir = '/home/%s/itPIR/latest' % env.user
 env.code_dir = '/home/%s/itPIR' % env.user
 env.repo = 'https://github.com/xoSauce/Lower-Cost-epsilon-Private-Information-Retrieval.git'
 env.timestamp = "release_%s" % int(time.time() * 1000)
@@ -15,29 +15,34 @@ env.activate = "source %s/releases/%s/%s/bin/activate" % (env.code_dir, env.time
 #timestamp="release_%s" % int(time.time() * 1000)
 def all_hosts():
     env.hosts = [
-        'key-broker'
-        , 'mix-node1'
-        , 'mix-node2'
-        , 'mix-node3'
-        , 'mix-node4'
-        , 'mix-node5'
+        'key-brokerU'
+        , 'mix-node1U'
+        , 'mix-node2U'
+        , 'mix-node3U'
+        , 'mix-node4U'
+        , 'mix-node5U'
     ]
 
 def mix_hosts():
     env.hosts = [
-        'mix-node1'
-        , 'mix-node2'
-        , 'mix-node3'
-        , 'mix-node4'
-        , 'mix-node5'
+        'mix-node1U'
+        , 'mix-node2U'
+        , 'mix-node3U'
+        , 'mix-node4U'
+        , 'mix-node5U'
     ]
 
 def mix_1():
-    env.hosts = ['mix-node1']
+    env.hosts = ['mix-node1U']
 
 def keybroker_host():
-    env.hosts = ['key-broker']
+    env.hosts = ['key-brokerU']
 
+def start_keybroker():
+    with virtualenv_latest():
+        with cd(env.latest_dir):
+            run('python3 m_keys_server.py')
+@parallel
 def start_mix_listener(ip, port):
     try:
         port = int(port)
@@ -45,37 +50,59 @@ def start_mix_listener(ip, port):
         pattern = re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         if not pattern.match(ip):
             return False
-        with cd(env.latest_dir):
-            run('python3 m_mixnode_server.py %s %s' % (ip, port))
+        with virtualenv_latest():  
+            with cd(env.latest_dir):
+                run("python3 m_mixnode_server.py %s %s" % (ip, port))   
     except ValueError:
         return False
 
+def clear_global_pip():
+    sudo("sudo pip freeze | xargs sudo pip uninstall -y")
+
+def remove_():
+    with cd("~"):
+        sudo("rm -rf itPIR")
+
 def deploy():
     define_permissions()
-    system_dependencies()
+    system_dependencies_ubuntu()
     fetch_repo()
     update_permissions()
     create_venv()
     run_pip()
     copy_latest()
-
+    
+def kill_python():
+    sudo("pkill python");
+    
 def copy_latest():
 
     with settings(warn_only=True):
         with cd(env.code_dir):
             run("mkdir -p %s" % env.latest_dir)
+            with cd(env.latest_dir):
+                run("rm -rf *")
         with cd("%s/releases/" % (env.code_dir)):
             directory = run("ls -td -- */ | head -n 1")
             with cd(directory):
-                run("cp -r * ../../%s" % (env.latest_dir))
+                run("cp -r * %s" % (env.latest_dir))
+
+def system_dependencies_ubuntu():
+    sudo('apt-get update')
+    sudo('apt-get install -y libssl-dev')
+    sudo("apt-get install -y python-pip python-dev python3-dev build-essential")
+    sudo('apt-get install -y libffi-dev')
+    sudo("apt-get install -y python3")
+    sudo("apt-get install -y git")
+    sudo("pip install virtualenv")
 
 def system_dependencies():
     sudo('yum install -y openssl-devel')
     sudo("yum groupinstall -y 'Development Tools'")
     sudo('yum install -y libffi-devel')
     sudo("yum install -y python35")
-    sudo("yum install -y python35-virtualenv.noarch")
     sudo("yum install -y git")
+    sudo("pip install virtualenv")
 
 def fetch_repo():
     with settings(warn_only=True):
@@ -88,18 +115,23 @@ def fetch_repo():
 
 def create_venv():
     with cd("%s/releases/%s" % (env.code_dir, env.timestamp)):
-        run("virtualenv-3.5 %s" % env.env_directory)
+        run("virtualenv -p python3 %s" % env.env_directory)
 
 @_contextmanager
 def virtualenv():
     with cd(env.code_dir):
         with prefix(env.activate):
             yield
+@_contextmanager
+def virtualenv_latest():
+    with cd(env.latest_dir):
+        with prefix("source ENV/bin/activate"):
+            yield
 
 def run_pip():
     with virtualenv():
         with cd("%s/releases/%s/" % (env.code_dir, env.timestamp)):
-            run('pip3.5 install -r requirements.txt --ignore-installed')
+            run('pip install -r requirements.txt --no-cache-dir')
             run('pip freeze')
 
 def define_permissions():

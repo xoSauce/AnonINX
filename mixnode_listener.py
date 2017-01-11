@@ -7,6 +7,7 @@ from threading import Thread
 from petlib.ec import EcPt
 from binascii import unhexlify
 from epspvt_utils import getGlobalSphinxParams
+from logger import *
 
 class Worker(Thread):
 	def __init__(self, socket, address, mixnode):
@@ -17,7 +18,6 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
-		##### TODO -- fix this -- reconstruct object
 		def reconstruct_header(h_0, h_1, h_2):
 			h_0 = unhexlify(h_0)
 			params = getGlobalSphinxParams()

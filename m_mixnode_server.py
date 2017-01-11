@@ -1,6 +1,7 @@
 from mix import MixNode
 from epspvt_utils import Debug
 from mixnode_listener import MixNodeListener
+from logger import *
 import argparse
 
 def parse():
@@ -13,6 +14,7 @@ def parse():
 	return args
 
 def main():
+	log_init("m_mixnode_server.log")
 	broker_config = vars(parse())
 	
 	if broker_config['debug']:
