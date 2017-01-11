@@ -11,11 +11,12 @@ from logger import *
 from socket_utils import recv_timeout
 from request_creator import RequestCreator
 class Worker(Thread):
-	def __init__(self, socket, address, mixnode):
+	def __init__(self, socket, address, mixnode, mix_port=8081):
 		Thread.__init__(self)
 		self.sock = socket
 		self.addr = address
 		self.mixnode = mixnode
+		self.mix_port = mix_port
 		self.start()
 
 	def run(self):
@@ -38,7 +39,7 @@ class Worker(Thread):
 			log_debug(result)
 			if result[1] is None:
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': addr, 'port': mix_port},
+					{'ip': self.addr, 'port': self.mix_port},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
