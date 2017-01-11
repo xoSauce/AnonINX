@@ -10,6 +10,8 @@ from epspvt_utils import getGlobalSphinxParams
 from logger import *
 from socket_utils import recv_timeout
 from request_creator import RequestCreator
+from network_sender import NetworkSender
+
 class Worker(Thread):
 	def __init__(self, socket, address, mixnode, mix_port=8081):
 		Thread.__init__(self)
@@ -17,6 +19,7 @@ class Worker(Thread):
 		self.addr = address
 		self.mixnode = mixnode
 		self.mix_port = mix_port
+		self.network_sender = NetworkSender()
 		self.start()
 
 	def run(self):
@@ -55,6 +58,6 @@ class MixNodeListener(GenericListener):
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()
-				Worker(clientsocket, address, self.mixnode)
+				Worker(clientsocket, address, self.mixnode, port)
 		finally:
 			self.serversocket.close()
