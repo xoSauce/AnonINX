@@ -42,6 +42,12 @@ def mix_1_2():
         , 'mix-node2U'
     ]
 
+def mix_1_2_3():
+    env.hosts = [
+        'mix-node1U'
+        , 'mix-node2U'
+        , 'mix-node3U'
+    ]
 def keybroker_host():
     env.hosts = ['key-brokerU']
 

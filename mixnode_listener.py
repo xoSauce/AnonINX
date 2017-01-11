@@ -31,14 +31,14 @@ class Worker(Thread):
 
 		raw_data = recv_timeout(self.sock, timeout=1)
 		data = json.loads(raw_data)
-		log_debug(data['payload'])
-		log_debug(data['type'])
 		if data['type'] == RequestType.push_to_mix.value:
 			data = data['payload']
 			header = reconstruct_header(data['header_0'], data['header_1'], data['header_2'])
 			delta = unhexlify(data['delta'])
+			log_debug(header)
+			print(header)
+			log_debug(delta)
 			result = self.mixnode.process(header, delta)
-			log_debug(result)
 			if result[1] is None:
 				json_data, dest = RequestCreator().post_msg_to_mix(
 					{'ip': result[0], 'port': self.mix_port},

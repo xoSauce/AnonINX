@@ -65,6 +65,7 @@ class Client:
 		header, delta, first_mix = prepare_forward_message(mixnodes_dict,
 			message,
 			dest)
+		print(header)
 		json_data, dest = RequestCreator().post_msg_to_mix(
 			{'ip': first_mix, 'port': mix_port},
 			{'header': header, 'delta': delta}
