@@ -13,10 +13,9 @@ from request_creator import RequestCreator
 from network_sender import NetworkSender
 
 class Worker(Thread):
-	def __init__(self, socket, address, mixnode, mix_port=8081):
+	def __init__(self, socket, mixnode, mix_port=8081):
 		Thread.__init__(self)
 		self.sock = socket
-		self.addr = address
 		self.mixnode = mixnode
 		self.mix_port = mix_port
 		self.network_sender = NetworkSender()
@@ -42,7 +41,7 @@ class Worker(Thread):
 			log_debug(result)
 			if result[1] is None:
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': self.addr, 'port': self.mix_port},
+					{'ip': result[0], 'port': self.mix_port},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
