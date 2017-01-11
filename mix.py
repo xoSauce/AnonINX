@@ -74,9 +74,10 @@ class MixNode():
 		print(routing)
 		if routing[0] == Relay_flag:
 			flag, addr = routing
-			return (addr, None)
+			return (Relay_flag, addr, header, delta)
 		elif routing[0] == Dest_flag:
-			return receive_forward(self.params, delta)
+			msg, dest = receive_forward(self.params, delta)
+			return (Dest_flag, msg, dest, None)
 			#Used currently for testing
 			if cb is not None:
 				cb()

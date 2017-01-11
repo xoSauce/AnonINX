@@ -11,6 +11,7 @@ from logger import *
 from socket_utils import recv_timeout
 from request_creator import RequestCreator
 from network_sender import NetworkSender
+from sphinxmix.SphinxClient import Relay_flag
 
 class Worker(Thread):
 	def __init__(self, socket, mixnode, mix_port=8081):
@@ -39,13 +40,17 @@ class Worker(Thread):
 			print(header)
 			log_debug(delta)
 			result = self.mixnode.process(header, delta)
-			if result[1] is None:
+			if result[0] == Relay_flag:
+				flag, addr, header, delta = result
 				json_data, dest = RequestCreator().post_msg_to_mix(
 					{'ip': result[0], 'port': self.mix_port},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
-
+			else:
+				flag, msg, dest = result
+				log_debug(msg)
+				log_debug(dest)
 
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):
