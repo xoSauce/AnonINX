@@ -18,6 +18,7 @@ class Worker(Thread):
 		if data['type'] == RequestType.publish_data.value:
 			self.broker.register(data['payload'])
 			self.sock.send(b'Key will be published.')
+			print(self.broker.get_cache())
 		elif data['type'] == RequestType.request_data.value:
 			data = self.broker.fetch(data['payload'])
 			self.sock.send(json.dumps(data).encode())

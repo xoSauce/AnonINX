@@ -40,7 +40,7 @@ class Client:
 			group = params.group.G	
 			mixnodes_dict = unhexlify_keys(mixnodes_dict)
 			mixnodes_dict = unhexlify_values(mixnodes_dict)
-			use_nodes = rand_subset(mixnodes_dict.keys(), 2)
+			use_nodes = rand_subset(mixnodes_dict.keys(), 3)
 			nodes_routing = list(map(Nenc, use_nodes))
 			pks_chosen_nodes = [
 				EcPt.from_binary(mixnodes_dict[key], group) 
