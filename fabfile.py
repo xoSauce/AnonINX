@@ -35,6 +35,13 @@ def mix_hosts():
 def mix_1():
     env.hosts = ['mix-node1U']
 
+
+def mix_1_2():
+    env.hosts = [
+        'mix-node1U'
+        , 'mix-node2U'
+    ]
+
 def keybroker_host():
     env.hosts = ['key-brokerU']
 
@@ -62,7 +69,7 @@ def clear_global_pip():
 def remove_():
     with cd("~"):
         sudo("rm -rf itPIR")
-
+@parallel
 def deploy():
     define_permissions()
     system_dependencies_ubuntu()
@@ -71,10 +78,10 @@ def deploy():
     create_venv()
     run_pip()
     copy_latest()
-    
+
 def kill_python():
     sudo("pkill python");
-    
+
 def copy_latest():
 
     with settings(warn_only=True):

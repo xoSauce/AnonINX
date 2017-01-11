@@ -26,6 +26,8 @@ class Worker(Thread):
 			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
 		data = json.loads(self.sock.recv(4096).decode())
+		log_debug(data['payload'])
+		log_debug(data['type'])
 		if data['type'] == RequestType.push_to_mix.value:
 			data = data['payload']
 			log.debug(data)
@@ -52,6 +54,5 @@ class MixNodeListener(GenericListener):
 			while 1:
 				clientsocket, address = self.serversocket.accept()
 				Worker(clientsocket, address, self.mixnode)
-			pass
 		finally:
 			self.serversocket.close()

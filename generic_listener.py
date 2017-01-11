@@ -1,5 +1,5 @@
 import socket
-
+from logger import *
 class GenericListener():
     def __init__(self, port, host = "0.0.0.0"):
         self.host = host
@@ -10,7 +10,7 @@ class GenericListener():
         self.serversocket.listen(5)
 
     def listen(self):
-        print ('server listening on {}'.format(self.port))   
+        log_debug('server listening on {}'.format(self.port))   
         pass
 
 if __name__ == '__main__':
