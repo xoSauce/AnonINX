@@ -43,7 +43,7 @@ class Worker(Thread):
 			if result[0] == Relay_flag:
 				flag, addr, header, delta = result
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': result[0], 'port': self.mix_port},
+					{'ip': addr, 'port': self.mix_port},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
