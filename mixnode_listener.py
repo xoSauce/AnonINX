@@ -8,6 +8,7 @@ from petlib.ec import EcPt
 from binascii import unhexlify
 from epspvt_utils import getGlobalSphinxParams
 from logger import *
+from socket_utils import recv_timeout
 
 class Worker(Thread):
 	def __init__(self, socket, address, mixnode):
@@ -25,7 +26,8 @@ class Worker(Thread):
 			ecPt = EcPt.from_binary(h_0, group)
 			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
-		data = json.loads(self.sock.recv().decode())
+		raw_data = recv_timeout(self.sock, timeout=1)
+		data = json.loads(raw_data.decode())
 		log_debug(data['payload'])
 		log_debug(data['type'])
 		if data['type'] == RequestType.push_to_mix.value:
