@@ -9,7 +9,7 @@ from binascii import unhexlify
 from epspvt_utils import getGlobalSphinxParams
 from logger import *
 from socket_utils import recv_timeout
-
+from request_creator import RequestCreator
 class Worker(Thread):
 	def __init__(self, socket, address, mixnode):
 		Thread.__init__(self)
