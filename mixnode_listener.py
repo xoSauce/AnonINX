@@ -48,7 +48,7 @@ class Worker(Thread):
 				)
 				self.network_sender.send_data(json_data, dest)
 			else:
-				flag, msg, dest = result
+				flag, msg, dest, _ = result
 				log_debug(msg)
 				log_debug(dest)
 
