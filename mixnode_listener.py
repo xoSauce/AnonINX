@@ -32,11 +32,10 @@ class Worker(Thread):
 		log_debug(data['type'])
 		if data['type'] == RequestType.push_to_mix.value:
 			data = data['payload']
-			log.debug(data)
 			header = reconstruct_header(data['header_0'], data['header_1'], data['header_2'])
 			delta = unhexlify(data['delta'])
 			result = self.mixnode.process(header, delta)
-			log.debug(result)
+			log_debug(result)
 			if result[1] is None:
 				json_data, dest = RequestCreator().post_msg_to_mix(
 					{'ip': addr, 'port': mix_port},
