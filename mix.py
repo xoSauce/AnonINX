@@ -76,7 +76,7 @@ class MixNode():
 			flag, addr = routing
 			return (Relay_flag, addr, header, delta)
 		elif routing[0] == Dest_flag:
-			msg, dest = receive_forward(self.params, delta)
+			dest, msg = receive_forward(self.params, delta)
 			return (Dest_flag, msg, dest, None)
 			#Used currently for testing
 			if cb is not None:
