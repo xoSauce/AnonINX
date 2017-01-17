@@ -17,7 +17,7 @@ class Client:
 	def getList(self, source):
 		request_creator = RequestCreator()
 		data_string, serialized_destination = request_creator.get_all_mixnode_request(source)
-		response = self.network_sender.send_data(data_string, serialized_destination)
+		response = self.network_sender.send_data_wait(data_string, serialized_destination)
 		return json.loads(response)
 
 	def fetch_data(self, index, mix_subset = 5, mix_port = 8081):

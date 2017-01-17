@@ -52,7 +52,7 @@ class MixNode():
 		keyGenerate(self.params)
 		json_data, destination = prepare_sending_pk(self.getPublicKey(), self.broker_config)
 		#publish key
-		response = self.network_sender.send_data(json_data, destination)
+		response = self.network_sender.send_data_wait(json_data, destination)
 		return response
 		
 	def getPrivateKey(self):

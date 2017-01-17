@@ -37,7 +37,6 @@ class Worker(Thread):
 			header = reconstruct_header(data['header_0'], data['header_1'], data['header_2'])
 			delta = unhexlify(data['delta'])
 			log_debug(header)
-			print(header)
 			log_debug(delta)
 			result = self.mixnode.process(header, delta)
 			if result[0] == Relay_flag:
