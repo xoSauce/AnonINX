@@ -8,17 +8,12 @@ from network_sender import NetworkSender
 from epspvt_utils import getGlobalSphinxParams, Debug
 from petlib.ec import EcPt
 from logger import *
+from broker_communicator import BrokerCommunicator
 
 class Client:
 	def __init__(self, public_key_server):
-		self.network_sender = NetworkSender()
+		self.broker_comm = BrokerCommunicator()
 		self.public_key_server = public_key_server
-	
-	def getList(self, source):
-		request_creator = RequestCreator()
-		data_string, serialized_destination = request_creator.get_all_mixnode_request(source)
-		response = self.network_sender.send_data_wait(data_string, serialized_destination)
-		return json.loads(response)
 
 	def fetch_data(self, index, mix_subset = 5, mix_port = 8081):
 		def unhexlify_keys(a_dict):
@@ -53,7 +48,7 @@ class Client:
 				message)
 			return (header, delta, use_nodes[0])
 		
-		mixnodes_dict = self.getList({
+		mixnodes_dict = self.broker_comm.getMixNodeList({
 				'ip': self.public_key_server['ip'],
 				'port': self.public_key_server['port']
 		})

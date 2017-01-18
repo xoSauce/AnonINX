@@ -3,9 +3,11 @@ from enum import Enum
 import json
 
 class RequestType(Enum):
-	    publish_data = 1
-	    request_data = 2
-	    push_to_mix = 3 
+	    publish_mix_data = 1
+	    publish_db_data = 2
+	    request_mix_list = 3
+	    request_db_list = 4
+	    push_to_mix = 5
 
 class RequestCreator():
 
@@ -14,7 +16,19 @@ class RequestCreator():
 
 	def get_all_mixnode_request(self, source):
 		request = {
-			'type': RequestType.request_data.value,
+			'type': RequestType.request_mix.value,
+			'payload': []
+		}
+		data_string = json.dumps(request)
+		serialized_destination = {
+			'ip':source['ip'],
+			'port': int(source['port'])
+		}
+		return (data_string, serialized_destination)
+
+	def get_all_db_request(self, source):
+		request = {
+			'type': RequestType.request_db.value,
 			'payload': []
 		}
 		data_string = json.dumps(request)

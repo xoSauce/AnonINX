@@ -3,36 +3,44 @@ from binascii import unhexlify
 
 class Broker():
 	def __init__(self):
-		self.public_keys = {}
+		self.mix_public_keys = {}
+		self.db_public_keys = {}
 		self.lock = threading.Lock()
 
-	def fetch(self, data):
+	### takes type='mix' or type='db'
+	def fetch(self, data, m_type):
 		self.lock.acquire()
+		if m_type == 'mix':
+			where_from = self.mix_public_keys
+
+		else
+			where_from = self.db_public_keys
 		try:
 			if data == []:
-				return self.get_cache()
+				return where_from
 			else:
-				return dict([x for x in map(self.get_cache_entry, data)])
+				return dict([x for x in map(self.get_cache_entry, data, where_from)])
 		finally:
 			self.lock.release()
 
-	def register(self, data):
+	def register(self, data, m_type):
 		self.lock.acquire()
+
 		try:
 			public_key_name = 'pk'
 			id_name = 'id'
 			if public_key_name in data and id_name in data:
 				data[id_name] = data[id_name]
-				self.public_keys.update({data[id_name]:data[public_key_name]}) 
+				if m_type == 'mix':
+					self.mix_public_keys.update({data[id_name]:data[public_key_name]})
+				else
+					self.db_public_keys.update({data[id_name]:data[public_key_name]})
 		finally:
 			self.lock.release()
-	
-	def get_cache(self):
-			return self.public_keys
 
-	def get_cache_entry(self, data):
-		if data['id'] in public_keys:
-			return (data['id'], public_keys[data['id']])
+	def get_cache_entry(self, data, where_from):
+		if data['id'] in where_from:
+			return (data['id'], where_from[data['id']])
 		else:
 			raise ValueError('Requested id: %s was not made public' % data['id'])
 

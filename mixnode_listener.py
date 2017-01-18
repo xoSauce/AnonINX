@@ -12,7 +12,7 @@ from socket_utils import recv_timeout
 from request_creator import RequestCreator
 from network_sender import NetworkSender
 from sphinxmix.SphinxClient import Relay_flag
-
+from broker_communicator import BrokerCommunicator
 class Worker(Thread):
 	def __init__(self, socket, mixnode, mix_port=8081):
 		Thread.__init__(self)

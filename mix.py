@@ -2,11 +2,11 @@ import sys
 import os
 from sphinxmix.SphinxParams import SphinxParams	
 from sphinxmix.SphinxNode import sphinx_process
-from sphinxmix.SphinxClient import pki_entry, PFdecode, Relay_flag, Dest_flag, receive_forward
+from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, receive_forward
 from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
-
+from encryptor import Encryptor
 class MixNode():
 
 	def __init__(self, broker_config):
@@ -16,18 +16,9 @@ class MixNode():
 		self.params = getGlobalSphinxParams()
 		self.network_sender = NetworkSender()
 		self.broker_config = broker_config
+		self.encryptor = Encryptor(params.group)
 
 	def publish_key(self):
-
-		def keyGenerate(params):
-			#This getIp() potentially needs to be reworked
-			ip = self.getIp().encode()
-			x = params.group.gensecret()
-			y = params.group.expon(params.group.g, x)
-			private_key = pki_entry(ip, x, y)
-			public_key = pki_entry(ip, None, y)
-			self.private_key = private_key
-			self.public_key = public_key
 
 		def prepare_sending_pk(public_key, server_config):
 			key_server_ip = server_config['pkserver']
@@ -49,17 +40,12 @@ class MixNode():
 				return None
 			return None
 
-		keyGenerate(self.params)
-		json_data, destination = prepare_sending_pk(self.getPublicKey(), self.broker_config)
+		self.public_key, self.private_key = self.encryptor.keyGenerate(self.getIp())
+		json_data, destination = prepare_sending_pk(self.public_key, self.broker_config)
 		#publish key
 		response = self.network_sender.send_data_wait(json_data, destination)
 		return response
 		
-	def getPrivateKey(self):
-		return self.private_key
-
-	def getPublicKey(self):
-		return self.public_key
 	
 	def getIp(self):
 		if self.ip is None:
@@ -67,8 +53,8 @@ class MixNode():
 		return self.ip
 
 	def process(self, header, delta, cb = None):
-		private_key = self.getPrivateKey()
-		ret = sphinx_process(self.params, self.getPrivateKey().x, header, delta)
+		private_key = self.private_key
+		ret = sphinx_process(self.params, private_key.x, header, delta)
 		(tag, info, (header, delta)) = ret
 		routing = PFdecode(self.params, info)
 		print(routing)
