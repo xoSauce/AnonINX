@@ -11,7 +11,6 @@ class NetworkSender():
 			ip = destination['ip']
 			port = destination['port']
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			print("FROM networkSender: ", ip, port)
 			s.connect((ip, port))
 			s.send(msg.encode())
 			s.close()
@@ -24,7 +23,6 @@ class NetworkSender():
 			ip = destination['ip']
 			port = destination['port']
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			print("FROM networkSender: ", ip, port)
 			s.connect((ip, port))
 			s.send(msg.encode())
 			data = s.recv(1024).decode()

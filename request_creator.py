@@ -8,6 +8,7 @@ class RequestType(Enum):
 	    request_mix_list = 3
 	    request_db_list = 4
 	    push_to_mix = 5
+	    request_db = 6
 
 class RequestCreator():
 
@@ -16,7 +17,7 @@ class RequestCreator():
 
 	def get_all_mixnode_request(self, source):
 		request = {
-			'type': RequestType.request_mix.value,
+			'type': RequestType.request_mix_list.value,
 			'payload': []
 		}
 		data_string = json.dumps(request)
@@ -28,7 +29,7 @@ class RequestCreator():
 
 	def get_all_db_request(self, source):
 		request = {
-			'type': RequestType.request_db.value,
+			'type': RequestType.request_db_list.value,
 			'payload': []
 		}
 		data_string = json.dumps(request)
@@ -55,16 +56,26 @@ class RequestCreator():
 		}
 		return (data_string, serialized_destination)
 
-	def post_key_request(self, destination, data):
-		### This is how to retreive back the EC2Point export
-		# debug_data = hexlify(public_key[2].export()).decode('utf-8')
-		# print (public_key[2].export())
-		# print (unhexlify(debug_data.encode()))
-		###
+	def post_mix_key_request(self, destination, data):
 		public_key_in_utf8 = {
-			'type': RequestType.publish_data.value,
+			'type': RequestType.publish_mix_data.value,
 			'payload': {
-				'id': hexlify(data['id']).decode('utf-8'),
+				'id': data['id'],
+				'pk': hexlify(data['pk'].export()).decode('utf-8')
+			}
+		}
+		data_string = json.dumps(public_key_in_utf8)
+		serialized_destination = {
+			'ip':destination['ip'], 
+			'port':int(destination['port'])
+		}
+		return (data_string, serialized_destination)
+
+	def post_db_key_request(self, destination, data):
+		public_key_in_utf8 = {
+			'type': RequestType.publish_db_data.value,
+			'payload': {
+				'id': data['id'],
 				'pk': hexlify(data['pk'].export()).decode('utf-8')
 			}
 		}

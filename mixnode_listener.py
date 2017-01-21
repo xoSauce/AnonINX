@@ -14,7 +14,7 @@ from network_sender import NetworkSender
 from sphinxmix.SphinxClient import Relay_flag
 from broker_communicator import BrokerCommunicator
 class Worker(Thread):
-	def __init__(self, socket, mixnode, mix_port=8081):
+	def __init__(self, socket, mixnode, mix_port):
 		Thread.__init__(self)
 		self.sock = socket
 		self.mixnode = mixnode
@@ -48,6 +48,7 @@ class Worker(Thread):
 				self.network_sender.send_data(json_data, dest)
 			else:
 				flag, msg, dest, _ = result
+				print(msg, dest)
 				log_debug(msg)
 				log_debug(dest)
 

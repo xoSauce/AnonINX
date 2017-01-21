@@ -1,14 +1,9 @@
-import sys
-import os
-from sphinxmix.SphinxParams import SphinxParams	
-from sphinxmix.SphinxNode import sphinx_process
-from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, receive_forward
 from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
 from encryptor import Encryptor
-class MixNode():
-
+import os
+class DbNode():
 	def __init__(self, broker_config):
 		self.private_key = None
 		self.public_key = None
@@ -18,11 +13,14 @@ class MixNode():
 		self.broker_config = broker_config
 		self.encryptor = Encryptor(self.params.group)
 
+	def getIp(self):
+		if self.ip is None:
+			self.ip = getPublicIp()
+		return self.ip
+	
 	def publish_key(self):
-
 		def prepare_sending_pk(public_key, server_config):
 			key_server_ip = server_config['pkserver']
-			file = server_config['file']
 			port = server_config['port']
 			try:
 				response = os.system("ping -c 1 " + key_server_ip)
@@ -30,7 +28,7 @@ class MixNode():
 					raise ValueError("Server: {} cannot be reached. The key was not published".format(ip))
 				else:
 					request_creator = RequestCreator()
-					json_data, destination = request_creator.post_mix_key_request(
+					json_data, destination = request_creator.post_db_key_request(
 						{'ip':key_server_ip, 'port':port},
 						{'id':public_key[0], 'pk':public_key[2]}
 					)
@@ -45,25 +43,3 @@ class MixNode():
 		#publish key
 		response = self.network_sender.send_data_wait(json_data, destination)
 		return response
-		
-	
-	def getIp(self):
-		if self.ip is None:
-			self.ip = getPublicIp()
-		return self.ip
-
-	def process(self, header, delta, cb = None):
-		private_key = self.private_key
-		ret = sphinx_process(self.params, private_key.x, header, delta)
-		(tag, info, (header, delta)) = ret
-		routing = PFdecode(self.params, info)
-		print(routing)
-		if routing[0] == Relay_flag:
-			flag, addr = routing
-			return (Relay_flag, addr, header, delta)
-		elif routing[0] == Dest_flag:
-			dest, msg = receive_forward(self.params, delta)
-			return (Dest_flag, msg, dest, None)
-			#Used currently for testing
-			if cb is not None:
-				cb()
