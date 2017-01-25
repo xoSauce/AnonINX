@@ -2,11 +2,13 @@ import sys
 import os
 from sphinxmix.SphinxParams import SphinxParams	
 from sphinxmix.SphinxNode import sphinx_process
-from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, receive_forward
+from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, Surb_flag, receive_forward
 from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
 from encryptor import Encryptor
+from broker_communicator import BrokerCommunicator
+from binascii import unhexlify
 class MixNode():
 
 	def __init__(self, broker_config):
@@ -17,12 +19,39 @@ class MixNode():
 		self.network_sender = NetworkSender()
 		self.broker_config = broker_config
 		self.encryptor = Encryptor(self.params.group)
+		self.db_list = None
+		self.broker_comm = BrokerCommunicator()
+
+	def getDbList(self):
+
+		def unhexlify_values(a_dict):
+			for x in a_dict.keys():
+				a_dict[x] = unhexlify(a_dict[x])
+			return a_dict
+
+		def _get_db_list(source):
+			dbs_dict_raw = self.broker_comm.getDBList({
+					'ip': source['ip'],
+					'port': source['port']
+			})
+			dbs_dict_raw = unhexlify_values(dbs_dict_raw)
+			dbs_dict = {}
+			for index, (key,value) in enumerate(dbs_dict_raw.items()):
+				dbs_dict['DB{}'.format(index)] = (key, value)
+			return dbs_dict
+		
+		if self.db_list == None:
+			source = {
+				'ip': self.broker_config['pkserver'],
+				'port': self.broker_config['port']
+			}
+			self.db_list = _get_db_list(source)
+		return self.db_list
 
 	def publish_key(self):
 
 		def prepare_sending_pk(public_key, server_config):
 			key_server_ip = server_config['pkserver']
-			file = server_config['file']
 			port = server_config['port']
 			try:
 				response = os.system("ping -c 1 " + key_server_ip)
@@ -64,6 +93,9 @@ class MixNode():
 		elif routing[0] == Dest_flag:
 			dest, msg = receive_forward(self.params, delta)
 			return (Dest_flag, msg, dest, None)
-			#Used currently for testing
 			if cb is not None:
 				cb()
+		elif routing[0] == Surb_flag:
+			flag, dest, myid = routing
+			print ("SURB: {} {} {}".format(flag,dest,myid))
+			return (flag, dest, myid)

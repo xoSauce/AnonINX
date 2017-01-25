@@ -11,8 +11,9 @@ from logger import *
 from socket_utils import recv_timeout
 from request_creator import RequestCreator
 from network_sender import NetworkSender
-from sphinxmix.SphinxClient import Relay_flag
+from sphinxmix.SphinxClient import Relay_flag, Dest_flag, Surb_flag
 from broker_communicator import BrokerCommunicator
+from epspvt_utils import Debug
 class Worker(Thread):
 	def __init__(self, socket, mixnode, mix_port):
 		Thread.__init__(self)
@@ -46,11 +47,19 @@ class Worker(Thread):
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
-			else:
+			elif result[0] == Dest_flag:
 				flag, msg, dest, _ = result
-				print(msg, dest)
+				json_data, dest = RequestCreator().post_msg_to_db(dest, msg)
+				if Debug.dbg:
+					dest['ip'] = '0.0.0.0'
+				self.network_sender.send_data(json_data, dest)
 				log_debug(msg)
 				log_debug(dest)
+			elif result[0] == Surb_flag:
+				flag, dest, myid = result
+				msg = {'myid': myid, 'delta': delta}
+				json_data, dest = RequestCreator().post_msg_to_client(dest, msg)
+				print ("SURB: {} {} {}".format(flag,dest,myid))
 
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):

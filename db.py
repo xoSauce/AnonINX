@@ -2,8 +2,26 @@ from epspvt_utils import getPublicIp, getGlobalSphinxParams
 from network_sender import NetworkSender
 from request_creator import RequestCreator
 from encryptor import Encryptor
+from broker_communicator import BrokerCommunicator
+from binascii import unhexlify
 import os
 class DbNode():
+	def _get_mixnode_list(self):
+		def unhexlify_values(a_dict):
+			for x in a_dict.keys():
+				a_dict[x] = unhexlify(a_dict[x])
+			return a_dict
+		source = {
+			'ip': self.broker_config['pkserver'],
+			'port': self.broker_config['port']
+		}
+		mixnodes_dict = self.broker_comm.getMixNodeList({
+				'ip': source['ip'],
+				'port': source['port']
+		})
+		mixnodes_dict = unhexlify_values(mixnodes_dict)
+		return mixnodes_dict
+
 	def __init__(self, broker_config):
 		self.private_key = None
 		self.public_key = None
@@ -12,12 +30,29 @@ class DbNode():
 		self.network_sender = NetworkSender()
 		self.broker_config = broker_config
 		self.encryptor = Encryptor(self.params.group)
+		self.mixnodes_list = None
+		self.broker_comm = BrokerCommunicator()
+	
+	def get_mixnode_list(self):
+		if self.mixnodes_list is None:
+			self.mixnodes_list = self._get_mixnode_list()
+		return self.mixnodes_list
 
 	def getIp(self):
 		if self.ip is None:
 			self.ip = getPublicIp()
 		return self.ip
 	
+	def decrypt(self, iv, text, pk, tag):
+		from binascii import unhexlify
+		print (self.private_key)
+		msg = self.encryptor.decrypt_aes_gcm((pk, iv, text, tag), self.private_key[1])
+		return msg
+	
+	def fetch_answer(self, msg):
+		ans = {'name':'John'}
+		return ans
+
 	def publish_key(self):
 		def prepare_sending_pk(public_key, server_config):
 			key_server_ip = server_config['pkserver']
