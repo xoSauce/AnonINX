@@ -12,6 +12,7 @@ from logger import *
 from broker_communicator import BrokerCommunicator
 from encryptor import Encryptor
 from petlib.pack import encode
+from client_listener import ClientListener
 class Client:
 	def __init__(self, public_key_server):
 		self.broker_comm = BrokerCommunicator()
@@ -20,6 +21,10 @@ class Client:
 		self.db_list = None
 		self.mixnode_list = None
 		self.ip = getPublicIp()
+
+	def listen(self, port):
+		self.client_listener = ClientListener(port, self)
+		self.client_listener.listen()
 	
 	def populate_broker_lists(self, source=None):
 		if source == None:
@@ -166,6 +171,7 @@ def main():
 		})
 	client.populate_broker_lists()
 	client.request_data(1, 'DB0')
+	client.listen(8083)
 
 if __name__ == '__main__':
 	main()

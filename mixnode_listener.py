@@ -53,13 +53,14 @@ class Worker(Thread):
 				if Debug.dbg:
 					dest['ip'] = '0.0.0.0'
 				self.network_sender.send_data(json_data, dest)
-				log_debug(msg)
-				log_debug(dest)
 			elif result[0] == Surb_flag:
 				flag, dest, myid = result
 				msg = {'myid': myid, 'delta': delta}
 				json_data, dest = RequestCreator().post_msg_to_client(dest, msg)
-				print ("SURB: {} {} {}".format(flag,dest,myid))
+				if Debug.dbg:
+					dest['ip'] = '0.0.0.0'
+				self.network_sender.send_data(json_data, dest)
+				print ("SURB: FLAG {} \n DEST {} \n MYID{} \n".format(flag,dest,myid))
 
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):
