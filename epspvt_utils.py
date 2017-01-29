@@ -1,6 +1,5 @@
 import requests
 from sphinxmix.SphinxParams import SphinxParams	
-#
 
 class Debug():
 	dbg = False

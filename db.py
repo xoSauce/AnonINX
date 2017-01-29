@@ -50,7 +50,10 @@ class DbNode():
 		return msg
 	
 	def fetch_answer(self, msg):
-		ans = {'name':'John'}
+		if msg['index'] == 1:
+			ans = {'name':'Real'}
+		else:
+			ans = {'name':'Fake'}
 		return ans
 
 	def publish_key(self):

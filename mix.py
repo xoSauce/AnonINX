@@ -97,5 +97,4 @@ class MixNode():
 				cb()
 		elif routing[0] == Surb_flag:
 			flag, dest, myid = routing
-			print ("SURB: {} {} {}".format(flag,dest,myid))
-			return (flag, dest, myid)
+			return (flag, dest, myid, delta)

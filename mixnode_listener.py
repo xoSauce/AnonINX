@@ -31,7 +31,7 @@ class Worker(Thread):
 			ecPt = EcPt.from_binary(h_0, group)
 			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
-		raw_data = recv_timeout(self.sock, timeout=1)
+		raw_data = recv_timeout(self.sock, timeout=0.1)
 		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
 			data = data['payload']
@@ -54,13 +54,13 @@ class Worker(Thread):
 					dest['ip'] = '0.0.0.0'
 				self.network_sender.send_data(json_data, dest)
 			elif result[0] == Surb_flag:
-				flag, dest, myid = result
+				print("RESULT {}".format(result))
+				flag, dest, myid, delta = result
 				msg = {'myid': myid, 'delta': delta}
-				json_data, dest = RequestCreator().post_msg_to_client(dest, msg)
+				json_data, dest = RequestCreator().post_msg_to_client(dest, "key", msg)
 				if Debug.dbg:
 					dest['ip'] = '0.0.0.0'
 				self.network_sender.send_data(json_data, dest)
-				print ("SURB: FLAG {} \n DEST {} \n MYID{} \n".format(flag,dest,myid))
 
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):

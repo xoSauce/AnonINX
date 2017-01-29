@@ -38,21 +38,19 @@ class Worker(Thread):
 				###TODO encrypt for destination
 				answer = json.dumps(self.dbnode.fetch_answer(decrypted_msg))
 				nymtuple = decrypted_msg['nymtuple']
+				first_node = decode(nymtuple[0])
+				# client_public_key = decrypted_msg['pk']
 				reply = encode(answer)
 				header,delta = package_surb(getGlobalSphinxParams(), nymtuple, reply)
+				print("DELTA_DB {}".format(delta))
 				mix_list = self.dbnode.get_mixnode_list()
-				use_nodes = rand_subset(mix_list.keys(), 5)
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': use_nodes[0], 'port': 8081},
+					{'ip': first_node[1], 'port': 8081},
 					{'header': header, 'delta': delta}
 				)
-				print(json_data, dest)
 				self.network_sender.send_data(json_data, dest)
-				print (use_nodes)
-				print (mix_list)
 			except Exception as e:
-				print(e)
-				log_debug("Requested message did not have the right type. {}".format(e))
+				raise e
 
 class DBListener(GenericListener):
 	def __init__(self, port, dbnode):

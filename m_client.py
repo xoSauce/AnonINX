@@ -3,7 +3,7 @@ import json
 from os import urandom
 from binascii import hexlify, unhexlify
 from sphinxmix.SphinxClient import pki_entry, Nenc
-from sphinxmix.SphinxClient import rand_subset, create_forward_message, create_surb
+from sphinxmix.SphinxClient import rand_subset, create_forward_message, create_surb, receive_surb
 from request_creator import RequestCreator
 from network_sender import NetworkSender
 from epspvt_utils import getGlobalSphinxParams, Debug, getPublicIp
@@ -11,21 +11,27 @@ from petlib.ec import EcPt
 from logger import *
 from broker_communicator import BrokerCommunicator
 from encryptor import Encryptor
-from petlib.pack import encode
+from petlib.pack import encode,decode
 from client_listener import ClientListener
+from message_creator import MessageCreator
 class Client:
 	def __init__(self, public_key_server):
 		self.broker_comm = BrokerCommunicator()
-		self.network_sender = NetworkSender()
 		self.public_key_server = public_key_server
 		self.db_list = None
 		self.mixnode_list = None
 		self.ip = getPublicIp()
+		self.encryptor = Encryptor(getGlobalSphinxParams().group)
+		self.surbDict = {}
 
-	def listen(self, port):
+	def listen(self, requested_index, port):
 		self.client_listener = ClientListener(port, self)
-		self.client_listener.listen()
+		self.client_listener.listen_for(requested_index)
 	
+	def recoverMessage(self, msg):
+		surbkeytuple, index = self.surbDict[msg['myid']]
+		return (index, decode(receive_surb(getGlobalSphinxParams(), surbkeytuple, msg['delta']))) 
+
 	def populate_broker_lists(self, source=None):
 		if source == None:
 			source = self.public_key_server
@@ -43,7 +49,7 @@ class Client:
 			dbs_dict_raw = unhexlify_values(dbs_dict_raw)
 			dbs_dict = {}
 			for index, (key,value) in enumerate(dbs_dict_raw.items()):
-				dbs_dict['DB{}'.format(index)] = (key, value)
+				dbs_dict[index] = (key, value)
 			return dbs_dict
 
 		def get_mixnode_list(source, client):
@@ -71,20 +77,20 @@ class Client:
 			destination = (destination[0], destination[1], port)
 			key = EcPt.from_binary(destination[1], getGlobalSphinxParams().group.G)
 			return (destination, key)
-		except KeyError as e:
-			raise 'Requested database not present or named incorrectly. {} not found'.format(destination)
+		except Exception as e:
+			raise Exception('Requested database not present or named incorrectly. {} not found'.format(destination))
 	
-	def request_data(self, index, db, mix_subset = 5, mix_port = 8081, session_name = None):
-		if session_name == None:
-			session_name = urandom(16)
+	def package_message(self, index, db, mix_subset = 5, mix_port = 8081, session_name = None):
+
+		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
+		self.session_name = session_name
 
 		def json_encode(arguments):
 			return json.dumps(dict(arguments))
 
 		def prepareDBPayload(msg, key, session_name):
 			group = getGlobalSphinxParams().group
-			encryptor = Encryptor(group)
-			g_x, iv, ciphertext, tag = encryptor.encrypt_aes_gcm(
+			g_x, iv, ciphertext, tag = self.encryptor.encrypt_aes_gcm(
 				msg
 				,key
 				,session_name
@@ -118,16 +124,17 @@ class Client:
 				nodes_routing_backward, 
 				pks_chosen_nodes_backward, 
 				self.ip)
+			self.surbDict[surbid] = [surbkeytuple]
 			message['nymtuple'] = nymtuple
+			# message['pk'] = self.public_key
 			message = encode(message)
-			json_msg = prepareDBPayload(message, key, 'session_name')
-			print(json_msg, dest)
+			json_msg = prepareDBPayload(message, key, self.session_name)
 			header, delta =  create_forward_message(params, 
 				nodes_routing_forward, 
 				pks_chosen_nodes_forward, 
 				dest, 
 				json_msg)
-			return (header, delta, use_nodes_forward[0])
+			return (header, delta, use_nodes_forward[0], surbid)
 		
 		if len(self.mixnode_list) == 0:
 			print("There are no mix-nodes available.")
@@ -138,17 +145,18 @@ class Client:
 			return
 		db_dest, key = self.create_db_destination(db)
 		message = self.create_db_message(index)
-		header, delta, first_mix = prepare_forward_message(self.mixnode_list,
+		header, delta, first_mix, surbid = prepare_forward_message(self.mixnode_list,
 			message,
 			db_dest,
 			key)
+		self.surbDict[surbid].append(index)
 		json_data, dest = RequestCreator().post_msg_to_mix(
 			{'ip': first_mix, 'port': mix_port},
 			{'header': header, 'delta': delta}
 		)
 		if Debug.dbg is True:
 			dest['ip'] = b'0.0.0.0'
-		self.network_sender.send_data(json_data, dest)
+		return (json_data, dest)
 		
 def parse():
 	parser = argparse.ArgumentParser()
@@ -170,8 +178,13 @@ def main():
 		'port': int(args['port'])
 		})
 	client.populate_broker_lists()
-	client.request_data(1, 'DB0')
-	client.listen(8083)
-
+	messageCreator = MessageCreator(client, 1)
+	requested_index, requested_db = (1,0)
+	messages = messageCreator.generate_messages(requested_index, requested_db)
+	network_sender = NetworkSender()
+	for db in messages:
+		[network_sender.send_data(json, dest) for json,dest in messages[db]]
+	client.listen(requested_index, 8083)
+	
 if __name__ == '__main__':
 	main()

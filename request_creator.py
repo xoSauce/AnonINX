@@ -1,5 +1,7 @@
 from binascii import hexlify, unhexlify
 from enum import Enum
+from epspvt_utils import Debug
+from petlib.pack import encode
 import json
 
 class RequestType(Enum):
@@ -11,10 +13,25 @@ class RequestType(Enum):
 	    push_to_db = 6
 	    push_to_client = 7
 
+class PortEnum(Enum):
+		broker  = 8080
+		mix = 8080
+		db = 8080
+		client = 8080
+
+class PortEnumDebug(Enum):
+		broker  = 8080
+		mix = 8081
+		db = 8082
+		client = 8083
+
 class RequestCreator():
 
 	def __init__(self):
-		pass
+		if Debug.dbg:
+			self.portEnum = PortEnumDebug
+		else:
+			self.portEnum = PortEnum
 
 	def get_all_mixnode_request(self, source):
 		request = {
@@ -70,18 +87,18 @@ class RequestCreator():
 		}
 		return (data_string, serialized_destination)
 
-	def post_msg_to_client(self, destination, data):
+	def post_msg_to_client(self, destination, key, data):
 		request = {
 			'type': RequestType.push_to_client.value,
-			'payload': data
+			'payload': hexlify(encode(data)).decode('utf-8')
 		}
-		print("DATA {}".format(data))
 		data_string = json.dumps(request)
 		serialized_destination = {
-			'ip': destination[0],
-			'key': destination[1],
-			'port': int(destination[2])
+			'ip': destination,
+			'key': key,
+			'port': self.portEnum.client.value
 		}
+		print(serialized_destination)
 		return (data_string, serialized_destination)
 
 	def post_mix_key_request(self, destination, data):
