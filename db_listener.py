@@ -33,10 +33,11 @@ class Worker(Thread):
 			text = unhexlify(data["text"].encode())
 			pk = EcPt.from_binary(unhexlify(data["pk"].encode()), getGlobalSphinxParams().group.G)
 			tag = unhexlify(data["tag"].encode())
+			pir_method = data["pir_method"]
 			decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
 			try:
 				###TODO encrypt for destination
-				answer = json.dumps(self.dbnode.fetch_answer(decrypted_msg))
+				answer = json.dumps(self.dbnode.fetch_answer(decrypted_msg, pir_method))
 				nymtuple = decrypted_msg['nymtuple']
 				first_node = decode(nymtuple[0])
 				# client_public_key = decrypted_msg['pk']

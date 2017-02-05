@@ -3,19 +3,19 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
 from binascii import hexlify
-import server_key_publisher as skp
+from broker import Broker
 from threading import Thread, Lock
 
 def test_broker_single_register():
-	broker = skp.Broker()
+	broker = Broker()
 	data = {'pk':hexlify(b'this is a test').decode('utf-8'),
 			'id':hexlify(b'someID').decode('utf-8')}
-	broker.register(data)
-	cache = broker.get_cache()
+	broker.register(data, 'mix')
+	cache = broker.fetch([], 'mix')
 	assert len(cache) == 1
 
 def test_broker_multiple_register():
-	broker = skp.Broker()
+	broker = Broker()
 	data = [
 	{'pk':hexlify(b'this is a test').decode('utf-8'),
 	'id':hexlify(b'someID1').decode('utf-8')},
@@ -29,8 +29,8 @@ def test_broker_multiple_register():
 	'id':hexlify(b'someID5').decode('utf-8')}
 	]
 	for entry in data:
-		broker.register(entry)
-	cache = broker.get_cache()
+		broker.register(entry, 'mix')
+	cache = broker.fetch([], 'mix')
 	assert len(cache) == 5
 
 def test_broker_multiple_register_multithreaded():
@@ -42,10 +42,10 @@ def test_broker_multiple_register_multithreaded():
 			self.start()
 
 		def run(self):
-			self.broker.register(self.data)
+			self.broker.register(self.data, 'mix')
 
 
-	broker = skp.Broker()
+	broker = Broker()
 	data = [
 	{'pk':hexlify(b'this is a test').decode('utf-8'),
 	'id':hexlify(b'someID1').decode('utf-8')},
@@ -64,5 +64,5 @@ def test_broker_multiple_register_multithreaded():
 	for t1 in threads:
 		t1.join()
 	
-	cache = broker.get_cache()
+	cache = broker.fetch([], 'mix')
 	assert len(cache) == 5

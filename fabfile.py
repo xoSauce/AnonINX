@@ -2,6 +2,7 @@ from __future__ import with_statement
 from contextlib import contextmanager as _contextmanager
 from fabric.api import *
 from fabric.contrib.console import confirm
+from fabric.operations import put
 import time
 
 env.use_ssh_config = True
@@ -21,7 +22,24 @@ def all_hosts():
         , 'mix-node3U'
         , 'mix-node4U'
         , 'mix-node5U'
+        , 'db1'
+        , 'db2'
+        , 'db3'
+        , 'db4'
     ]
+
+def all_dbs():
+	env.hosts = [
+		'db1',
+		'db2',
+		'db3',
+		'db4',
+	]
+
+def db_1():
+	env.hosts = [
+		'db1'
+	]
 
 def mix_hosts():
     env.hosts = [
@@ -84,6 +102,10 @@ def deploy():
     create_venv()
     run_pip()
     copy_latest()
+
+def deploy_db_file(path_db):
+	run("mkdir -p %s" % "dbs")
+	put(path_db, "dbs/")
 
 def kill_python():
     sudo("pkill python");

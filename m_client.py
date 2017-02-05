@@ -80,7 +80,7 @@ class Client:
 		except Exception as e:
 			raise Exception('Requested database not present or named incorrectly. {} not found'.format(destination))
 	
-	def package_message(self, index, db, mix_subset = 5, mix_port = 8081, session_name = None):
+	def package_message(self, index, db, pir_xor, mix_subset = 5, mix_port = 8081, session_name = None):
 
 		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
 		self.session_name = session_name
@@ -100,6 +100,7 @@ class Client:
 				,'iv': hexlify(iv).decode('utf-8')
 				,'text': hexlify(ciphertext).decode('utf-8')
 				,'tag' : hexlify(tag).decode('utf-8')
+				,'pir_method': pir_xor
 			}
 			json_msg = json.dumps(e_message, ensure_ascii=False)
 			return (json_msg)
@@ -161,8 +162,11 @@ class Client:
 def parse():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-d', '--debug', action= "store_true", help = "Debug Mode -- to be able to connect to own computer via local ip (skip public ip connection)")
+	parser.add_argument('-x', '--xor', action="store_true", help = "Use vector xoring method")
 	parser.add_argument('pkserver', help = "Specify the public IP address of the server where public keys will be stored.")
 	parser.add_argument('port', help="Specify the port where the server is listening for connections")
+	parser.add_argument('-i', '--requested_index', help="Specify the index to retrieve")
+	parser.add_argument('-db', '--database', help="Specify the number of the datbase in the range[0-?]")
 	args = parser.parse_args()
 	return args
 
@@ -178,9 +182,16 @@ def main():
 		'port': int(args['port'])
 		})
 	client.populate_broker_lists()
-	messageCreator = MessageCreator(client, 1)
-	requested_index, requested_db = (1,0)
-	messages = messageCreator.generate_messages(requested_index, requested_db)
+	index = int(args['requested_index'])
+	db = int(args['database'])
+	requested_index, requested_db = (index, db)
+	messageCreator = MessageCreator(client)
+
+	if args['xor']:
+		messages = messageCreator.generate_messages(requested_index, requested_db, 10, pir_xor = True)
+	else:
+		messages = messageCreator.generate_messages(requested_index, requested_db, 10, pir_xor = False)
+	print(messages)
 	network_sender = NetworkSender()
 	for db in messages:
 		[network_sender.send_data(json, dest) for json,dest in messages[db]]

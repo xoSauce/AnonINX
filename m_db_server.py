@@ -6,8 +6,8 @@ import argparse
 
 def parse():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-f', '--file', help = "The IP address will be stored in this file. Alternatively a default file will be provided.")
-	parser.add_argument('-d', '--debug', action='store_true', help = "The IP address will be stored in this file. Alternatively a default file will be provided.")
+	parser.add_argument('-db', '--database', help = "specify the db to cache")
+	parser.add_argument('-d', '--debug', action='store_true', help = "Debug mode will route all the public ips to 0.0.0.0")
 	parser.add_argument('pkserver', help = "Specify the public IP address of the server where public keys will be stored.")
 	parser.add_argument('port', help="Specify the port where the server is listening for connections")
 	args = parser.parse_args()
@@ -16,7 +16,7 @@ def parse():
 def main():
 	log_init("m_mixnode_server.log")
 	broker_config = vars(parse())
-	
+
 	if broker_config['debug']:
 		Debug.dbg = True
 

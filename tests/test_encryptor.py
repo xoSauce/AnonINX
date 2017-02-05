@@ -5,6 +5,7 @@ print myPath
 from encryptor import Encryptor
 from sphinxmix.SphinxParams import SphinxParams
 from binascii import hexlify
+
 def test_encryptor_encrypt_decrypt():
 	params = SphinxParams()
 	group = params.group

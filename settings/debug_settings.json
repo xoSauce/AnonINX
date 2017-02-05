@@ -1,0 +1,70 @@
+{
+  "broker": 
+  {
+      "name": "keybroker",
+      "hostname": "ec2-34-248-251-160.eu-west-1.compute.amazonaws.com",
+      "user": "ubuntu",
+      "pemfile": "~/.ssh/e-PrivateDBs.pem"
+  },
+  "mixnodes": [
+    {
+      "name": "mixnode1",
+      "hostname": "ec2-52-213-248-231.eu-west-1.compute.amazonaws.com",
+      "user": "ubuntu",
+      "pemfile": "~/.ssh/e-PrivateDBs.pem"
+    },
+    {
+      "name": "mixnode2",
+      "hostname": "ec2-52-214-93-48.eu-west-1.compute.amazonaws.com",
+      "user": "ubuntu",
+      "pemfile": "~/.ssh/e-PrivateDBs.pem"
+    },
+    {
+      "name": "mixnode3",
+      "hostname": "ec2-52-214-228-169.eu-west-1.compute.amazonaws.com",
+      "user": "ubuntu",
+      "pemfile": "~/.ssh/e-PrivateDBs.pem"
+    },
+    {
+      "name": "mixnode4",
+      "hostname": "ec2-52-214-175-11.eu-west-1.compute.amazonaws.com",
+      "user": "ubuntu",
+      "pemfile": "~/.ssh/e-PrivateDBs.pem"
+    },
+    {
+      "name": "mixnode5",
+      "hostname": "ec2-52-214-175-11.eu-west-1.compute.amazonaws.com",
+      "user": "ubuntu",
+      "pemfile": "~/.ssh/e-PrivateDBs.pem"
+    }
+  ],
+  "database": {
+    "file": "path_to_file",
+    "instances": [
+      {
+        "name": "db1",
+        "hostname": "",
+        "user": "ubuntu",
+        "pemfile": "~/.ssh/e-PrivateDBs.pem"
+      },
+      {
+        "name": "db2",
+        "hostname": "",
+        "user": "ubuntu",
+        "pemfile": "~/.ssh/e-PrivateDBs.pem"
+      },
+      {
+        "name": "db3",
+        "hostname": "",
+        "user": "ubuntu",
+        "pemfile": "~/.ssh/e-PrivateDBs.pem"
+      },
+      {
+        "name": "db4",
+        "hostname": "",
+        "user": "ubuntu",
+        "pemfile": "~/.ssh/e-PrivateDBs.pem"
+      }
+    ]
+  } 
+}

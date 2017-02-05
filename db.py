@@ -4,8 +4,10 @@ from request_creator import RequestCreator
 from encryptor import Encryptor
 from broker_communicator import BrokerCommunicator
 from binascii import unhexlify
+import json
 import os
 class DbNode():
+	
 	def _get_mixnode_list(self):
 		def unhexlify_values(a_dict):
 			for x in a_dict.keys():
@@ -32,7 +34,14 @@ class DbNode():
 		self.encryptor = Encryptor(self.params.group)
 		self.mixnodes_list = None
 		self.broker_comm = BrokerCommunicator()
-	
+		self.records = {}
+		self.loadRecords()
+
+	def loadRecords(self):
+		path = self.broker_config['database']
+		f = open(path, 'r')
+		self.records = json.load(f)
+
 	def get_mixnode_list(self):
 		if self.mixnodes_list is None:
 			self.mixnodes_list = self._get_mixnode_list()
@@ -49,12 +58,28 @@ class DbNode():
 		msg = self.encryptor.decrypt_aes_gcm((pk, iv, text, tag), self.private_key[1])
 		return msg
 	
-	def fetch_answer(self, msg):
-		if msg['index'] == 1:
-			ans = {'name':'Real'}
+	def xor_records(self, mlist):
+		records = self.getRecords()
+		for row in mlist:
+			message = ''
+			for i in range(0, len(row)):
+				if row[i] == 1:
+					if message == '':
+						message = records[i]
+					else:
+						message = pir_executor.stringXorer(message, records[i])
+		return message
+
+	def getRecords(self):
+		return self.records
+
+	def fetch_answer(self, msg, pir_xor):
+		if not pir_xor:
+			index = msg['index']
+			return self.getRecords()['collection'][index]
 		else:
-			ans = {'name':'Fake'}
-		return ans
+			print("NeedTOXor")
+			return ""
 
 	def publish_key(self):
 		def prepare_sending_pk(public_key, server_config):
