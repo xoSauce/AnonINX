@@ -197,7 +197,7 @@ def main():
 	network_sender = NetworkSender()
 	for db in messages:
 		[network_sender.send_data(json, dest) for json,dest in messages[db]]	
-	client.listen(requested_index, portEnum.db)
+	client.listen(requested_index, portEnum.client.value)
 	
 if __name__ == '__main__':
 	main()

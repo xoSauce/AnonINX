@@ -16,12 +16,12 @@ from petlib.pack import encode, decode
 from sphinxmix.SphinxClient import create_surb, package_surb, rand_subset
 
 class Worker(Thread):
-	def __init__(self, socket, dbnode, db_port, mix_port):
+	def __init__(self, socket, dbnode, db_port, mixport):
 		Thread.__init__(self)
 		self.sock = socket
 		self.dbnode = dbnode
 		self.db_port = db_port
-		self.mix_port = mix_port
+		self.mixport = mixport
 		self.network_sender = NetworkSender()
 		self.start()
 
@@ -45,7 +45,7 @@ class Worker(Thread):
 				print("DELTA_DB {}".format(delta))
 				mix_list = self.dbnode.get_mixnode_list()
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': first_node[1], 'port': self.mix_port},
+					{'ip': first_node[1], 'port': self.mixport},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
@@ -53,16 +53,16 @@ class Worker(Thread):
 				raise e
 
 class DBListener(GenericListener):
-	def __init__(self, db_port, mix_port, dbnode):
+	def __init__(self, db_port, mixport, dbnode):
 		super().__init__(db_port)
 		self.dbnode = dbnode
-		self.mixport = mix_port
+		self.mixport = mixport
 	
 	def listen(self):
 		super().listen()
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()
-				Worker(clientsocket, self.dbnode, self.port, self.mix_port)
+				Worker(clientsocket, self.dbnode, self.port, self.mixport)
 		finally:
 			self.serversocket.close()
