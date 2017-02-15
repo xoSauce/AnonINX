@@ -16,13 +16,13 @@ from petlib.pack import encode, decode
 from sphinxmix.SphinxClient import create_surb, package_surb, rand_subset
 
 class Worker(Thread):
-	def __init__(self, socket, dbnode, db_port, portEnum):
+	def __init__(self, socket, dbnode, db_port, mix_port):
 		Thread.__init__(self)
 		self.sock = socket
 		self.dbnode = dbnode
 		self.db_port = db_port
+		self.mix_port = mix_port
 		self.network_sender = NetworkSender()
-		self.portEnum = portEnum
 		self.start()
 
 	def run(self):
@@ -37,7 +37,6 @@ class Worker(Thread):
 			decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
 			try:
 				###TODO encrypt for destination
-				mix_port = self.portEnum.mix.value
 				answer = json.dumps(self.dbnode.fetch_answer(decrypted_msg, pir_method))
 				nymtuple = decrypted_msg['nymtuple']
 				first_node = decode(nymtuple[0])
@@ -46,7 +45,7 @@ class Worker(Thread):
 				print("DELTA_DB {}".format(delta))
 				mix_list = self.dbnode.get_mixnode_list()
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': first_node[1], 'port': mix_port},
+					{'ip': first_node[1], 'port': self.mix_port},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)
@@ -54,15 +53,16 @@ class Worker(Thread):
 				raise e
 
 class DBListener(GenericListener):
-	def __init__(self, port, dbnode):
-		super().__init__(port)
+	def __init__(self, db_port, mix_port, dbnode):
+		super().__init__(db_port)
 		self.dbnode = dbnode
+		self.mixport = mix_port
 	
 	def listen(self):
 		super().listen()
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()
-				Worker(clientsocket, self.dbnode, self.port)
+				Worker(clientsocket, self.dbnode, self.port, self.mix_port)
 		finally:
 			self.serversocket.close()
