@@ -18,6 +18,7 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
+		print("here")
 		raw_data = recv_timeout(self.sock, timeout=0.1)
 		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_client.value:

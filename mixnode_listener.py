@@ -58,9 +58,9 @@ class Worker(Thread):
 				flag, dest, myid, delta = result
 				msg = {'myid': myid, 'delta': delta}
 				json_data, dest = RequestCreator().post_msg_to_client(dest, "key", msg)
-				print(dest)
 				if Debug.dbg:
 					dest['ip'] = '0.0.0.0'
+				print(dest)
 				self.network_sender.send_data(json_data, dest)
 
 class MixNodeListener(GenericListener):
