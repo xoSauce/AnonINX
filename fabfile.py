@@ -68,7 +68,8 @@ def mix_hosts():
 
 def mix_1():
     env.hosts = ['mix-node1U']
-
+def mix_2():
+    env.hosts = ['mix-node2U']
 
 def mix_1_2():
     env.hosts = [
