@@ -3,7 +3,10 @@ from contextlib import contextmanager as _contextmanager
 from fabric.api import *
 from fabric.contrib.console import confirm
 from fabric.operations import put
+from fabric.contrib.files import exists
+import os
 import time
+import re
 
 env.use_ssh_config = True
 env.env_directory = 'ENV'
@@ -27,6 +30,14 @@ def all_hosts():
         , 'db3'
         , 'db4'
     ]
+def debug_hosts():
+	env.hosts = [
+     	'key-brokerU'
+        , 'mix-node1U'
+        , 'mix-node2U'
+        , 'db1'
+        , 'db2'
+	]
 
 def all_dbs():
 	env.hosts = [
@@ -40,6 +51,11 @@ def db_1():
 	env.hosts = [
 		'db1'
 	]
+
+def db_2():
+    env.hosts = [
+        'db2'
+    ]
 
 def mix_hosts():
     env.hosts = [
@@ -74,10 +90,22 @@ def start_keybroker():
         with cd(env.latest_dir):
             run('python3 m_keys_server.py')
 @parallel
+def start_db_listener(ip, port, db_path):
+    if not exists(db_path):
+        print("db_path: {} not found".format(db_path))
+        return False
+    port = int(port)
+    pattern = re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
+    if not pattern.match(ip):
+        return False
+    with virtualenv_latest():  
+        with cd(env.latest_dir):
+            run_string = "python3 m_db_server.py {} {} -db {}".format(ip,port,db_path) 
+            run(run_string)
+@parallel
 def start_mix_listener(ip, port):
     try:
         port = int(port)
-        import re
         pattern = re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         if not pattern.match(ip):
             return False

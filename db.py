@@ -4,6 +4,7 @@ from request_creator import RequestCreator
 from encryptor import Encryptor
 from broker_communicator import BrokerCommunicator
 from binascii import unhexlify
+from pir_executor import PIRExecutor
 import json
 import os
 class DbNode():
@@ -74,12 +75,23 @@ class DbNode():
 		return self.records
 
 	def fetch_answer(self, msg, pir_xor):
+		db_cache = self.getRecords()['collection']
+		print (db_cache)
 		if not pir_xor:
 			index = msg['index']
-			return self.getRecords()['collection'][index]
+			return db_cache[index]
 		else:
 			print("NeedTOXor")
-			return ""
+			pir_executor = PIRExecutor()
+			vector = msg['index']
+			message = ''
+			for i, val in enumerate(vector):
+				if val == 1:
+					if message == '':
+						message = db_cache[i]
+					else:
+						message = pir_executor.stringXorer(message, db_cache[i])
+			return message
 
 	def publish_key(self):
 		def prepare_sending_pk(public_key, server_config):
