@@ -81,7 +81,6 @@ class DbNode():
 			index = msg['index']
 			return db_cache[index]
 		else:
-			print("NeedTOXor")
 			pir_executor = PIRExecutor()
 			vector = msg['index']
 			message = ''

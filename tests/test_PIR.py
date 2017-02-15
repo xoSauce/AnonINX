@@ -9,7 +9,7 @@ def test_PIR_getMessagePack():
 	size = 100
 	for i in range(20):
 		pir_executor = PIRExecutor()
-		m = pir_executor._getMessagePack(index, size)
+		m = pir_executor._getMessagePack(index, size, 5)
 		l = m[index]
 		## assert requested is odd
 		assert sum(l) % 2 != 0
@@ -78,7 +78,7 @@ def test_PIR_protocol():
 	for index in range(0, len(messages)):
 		size = len(messages)
 		pir_executor = PIRExecutor()
-		m = pir_executor.getMessagePack(index, size)
+		m = pir_executor.getMessagePack(index, size, 5)
 		db_returns = []
 		for row in m:
 			message = ''

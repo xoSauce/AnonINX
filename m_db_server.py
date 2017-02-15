@@ -2,6 +2,7 @@ from db import DbNode
 from epspvt_utils import Debug
 from db_listener import DBListener
 from logger import *
+from requestCreator import PortEnum, PortEnumDebug
 import argparse
 
 def parse():
@@ -17,12 +18,14 @@ def main():
 	log_init("m_mixnode_server.log")
 	broker_config = vars(parse())
 
+	portEnum = PortEnum
 	if broker_config['debug']:
 		Debug.dbg = True
+		portEnum = PortEnumDebug
 
 	dbNode = DbNode(broker_config)
 	response = dbNode.publish_key()
-	dbListener = DBListener(8082, dbNode)
+	dbListener = DBListener(portEnum.db.value, dbNode, portEnum)
 	dbListener.listen()
 
 if __name__ == '__main__':

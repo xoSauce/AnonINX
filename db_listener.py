@@ -17,12 +17,13 @@ from petlib.pack import encode, decode
 from sphinxmix.SphinxClient import create_surb, package_surb, rand_subset
 
 class Worker(Thread):
-	def __init__(self, socket, dbnode, db_port):
+	def __init__(self, socket, dbnode, db_port, portEnum):
 		Thread.__init__(self)
 		self.sock = socket
 		self.dbnode = dbnode
 		self.db_port = db_port
 		self.network_sender = NetworkSender()
+		self.portEnum = portEnum
 		self.start()
 
 	def run(self):
@@ -37,16 +38,16 @@ class Worker(Thread):
 			decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
 			try:
 				###TODO encrypt for destination
+				mix_port = self.portEnum.mix.value
 				answer = json.dumps(self.dbnode.fetch_answer(decrypted_msg, pir_method))
 				nymtuple = decrypted_msg['nymtuple']
 				first_node = decode(nymtuple[0])
-				# client_public_key = decrypted_msg['pk']
 				reply = encode(answer)
 				header,delta = package_surb(getGlobalSphinxParams(), nymtuple, reply)
 				print("DELTA_DB {}".format(delta))
 				mix_list = self.dbnode.get_mixnode_list()
 				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': first_node[1], 'port': 8081},
+					{'ip': first_node[1], 'port': mix_port},
 					{'header': header, 'delta': delta}
 				)
 				self.network_sender.send_data(json_data, dest)

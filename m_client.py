@@ -4,7 +4,7 @@ from os import urandom
 from binascii import hexlify, unhexlify
 from sphinxmix.SphinxClient import pki_entry, Nenc
 from sphinxmix.SphinxClient import rand_subset, create_forward_message, create_surb, receive_surb
-from request_creator import RequestCreator
+from request_creator import RequestCreator, PortEnum, PortEnumDebug
 from network_sender import NetworkSender
 from epspvt_utils import getGlobalSphinxParams, Debug, getPublicIp
 from petlib.ec import EcPt
@@ -71,7 +71,7 @@ class Client:
 			}
 		return msg
 
-	def create_db_destination(self, destination, port = 8082):
+	def create_db_destination(self, destination, port):
 		try:
 			destination = self.db_list[destination]
 			destination = (destination[0], destination[1], port)
@@ -80,7 +80,7 @@ class Client:
 		except Exception as e:
 			raise Exception('Requested database not present or named incorrectly. {} not found'.format(destination))
 	
-	def package_message(self, index, db, pir_xor, mix_subset = 5, mix_port = 8081, session_name = None):
+	def package_message(self, index, db, pir_xor, portEnum, mix_subset = 5, session_name = None):
 
 		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
 		self.session_name = session_name
@@ -105,7 +105,7 @@ class Client:
 			json_msg = json.dumps(e_message, ensure_ascii=False)
 			return (json_msg)
 
-		def prepare_forward_message(mixnodes_dict, message, dest, key):
+		def prepare_forward_message(mixnodes_dict, message, dest, key, portEnum):
 			params = getGlobalSphinxParams()
 			group = params.group.G	
 			use_nodes_forward = rand_subset(mixnodes_dict.keys(), 5)
@@ -144,15 +144,16 @@ class Client:
 		if len(self.db_list) == 0:
 			print("There are no databases available.")
 			return
-		db_dest, key = self.create_db_destination(db)
+		db_dest, key = self.create_db_destination(db, portEnum.db.value)
 		message = self.create_db_message(index)
 		header, delta, first_mix, surbid = prepare_forward_message(self.mixnode_list,
 			message,
 			db_dest,
-			key)
+			key,
+			portEnum)
 		self.surbDict[surbid].append(index)
 		json_data, dest = RequestCreator().post_msg_to_mix(
-			{'ip': first_mix, 'port': mix_port},
+			{'ip': first_mix, 'port': portEnum.mix.value},
 			{'header': header, 'delta': delta}
 		)
 		if Debug.dbg is True:
@@ -173,13 +174,14 @@ def parse():
 def main():
 	log_init("m_client.log")
 	args = vars(parse())
-	
+	portEnum = PortEnum
 	if args['debug']:
 		Debug.dbg = True
+		portEnum = PortEnumDebug
 
 	client = Client({
 		'ip':args['pkserver'],
-		'port': int(args['port'])
+		'port': portEnum.broker.value
 		})
 	client.populate_broker_lists()
 	index = int(args['requested_index'])
@@ -188,14 +190,14 @@ def main():
 	messageCreator = MessageCreator(client)
 
 	if args['xor']:
-		messages = messageCreator.generate_messages(requested_index, requested_db, 10, pir_xor = True)
+		messages = messageCreator.generate_messages(requested_index, requested_db, 10, portEnum, pir_xor = True)
 	else:
-		messages = messageCreator.generate_messages(requested_index, requested_db, 10, pir_xor = False)
+		messages = messageCreator.generate_messages(requested_index, requested_db, 10, portEnum, pir_xor = False)
 	print(messages)
 	network_sender = NetworkSender()
 	for db in messages:
-		[network_sender.send_data(json, dest) for json,dest in messages[db]]
-	client.listen(requested_index, 8083)
+		[network_sender.send_data(json, dest) for json,dest in messages[db]]	
+	client.listen(requested_index, portEnum.db)
 	
 if __name__ == '__main__':
 	main()

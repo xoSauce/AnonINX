@@ -95,7 +95,6 @@ class RequestCreator():
 		data_string = json.dumps(request)
 		serialized_destination = {
 			'ip': destination,
-			'key': key,
 			'port': self.portEnum.client.value
 		}
 		print(serialized_destination)
