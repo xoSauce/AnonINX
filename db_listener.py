@@ -1,7 +1,7 @@
 import socket
 import json
 from generic_listener import GenericListener
-from request_creator import RequestType
+from request_creator import RequestType, RequestCreator
 from mix import MixNode
 from threading import Thread
 from petlib.ec import EcPt
@@ -9,7 +9,6 @@ from binascii import unhexlify
 from epspvt_utils import getGlobalSphinxParams
 from logger import *
 from socket_utils import recv_timeout
-from request_creator import RequestCreator
 from network_sender import NetworkSender
 from sphinxmix.SphinxClient import Relay_flag
 from broker_communicator import BrokerCommunicator

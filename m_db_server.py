@@ -2,7 +2,7 @@ from db import DbNode
 from epspvt_utils import Debug
 from db_listener import DBListener
 from logger import *
-from requestCreator import PortEnum, PortEnumDebug
+from request_creator import PortEnum, PortEnumDebug
 import argparse
 
 def parse():

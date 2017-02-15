@@ -2,7 +2,7 @@ from mix import MixNode
 from epspvt_utils import Debug
 from mixnode_listener import MixNodeListener
 from logger import *
-from requestCreator import PortEnum, PortEnumDebug
+from request_creator import PortEnum, PortEnumDebug
 import argparse
 
 def parse():
