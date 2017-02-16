@@ -37,7 +37,7 @@ class Worker(Thread):
 			decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
 			try:
 				###TODO encrypt for destination
-				answer = json.dumps(self.dbnode.fetch_answer(decrypted_msg, pir_method))
+				answer = self.dbnode.fetch_answer(decrypted_msg, pir_method)
 				nymtuple = decrypted_msg['nymtuple']
 				first_node = decode(nymtuple[0])
 				reply = encode(answer)
