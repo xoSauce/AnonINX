@@ -13,6 +13,7 @@ from broker_communicator import BrokerCommunicator
 from encryptor import Encryptor
 from petlib.pack import encode,decode
 from client_poller import ClientPoller
+from pir_executor import PIRExecutor
 from message_creator import MessageCreator
 class Client:
 	def __init__(self, public_key_server):
@@ -24,10 +25,27 @@ class Client:
 		self.encryptor = Encryptor(getGlobalSphinxParams().group)
 		self.surbDict = {}
 
-	def poll(self):
+	def xor(self, messages):
+		pir_executor = PIRExecutor()
+		message = messages[0]
+		for m in messages[1:]:
+			message = pir_executor.stringXorer(message, m)
+		return message.decode().strip()
+
+	def poll(self, pir, requested_index):
 		self.client_poller = ClientPoller()
+		threads = []
+		messages = {}
 		for surbid, data in self.surbDict.items():
-			self.client_poller.poll_with((surbid, data['source']), self)
+			threads.append(self.client_poller.poll_with((surbid, data['source']), self, messages))
+		for t in threads:
+			t.start()
+		for t in threads:
+			t.join()
+		if pir:
+			return self.xor(list(messages.values()))
+		else:
+			return messages[str(requested_index)].strip()
 		
 	def recoverMessage(self, msg, myid):
 		surbkeytuple = self.surbDict[myid]['surbkeytuple']
@@ -199,6 +217,6 @@ def main():
 	network_sender = NetworkSender()
 	for db in messages:
 		[network_sender.send_data(json, dest) for json,dest in messages[db]]	
-	client.poll()
+	print(client.poll(args['xor'], requested_index), requested_index)
 if __name__ == '__main__':
 	main()

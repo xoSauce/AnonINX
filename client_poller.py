@@ -3,14 +3,14 @@ from threading import Thread
 from network_sender import NetworkSender
 from binascii import unhexlify
 class Worker(Thread):
-	def __init__(self, myid, mixnode, client):
+	def __init__(self, myid, mixnode, client, message_pool):
 		Thread.__init__(self)
 		self.id = myid
 		self.mixnode = mixnode
 		self.network_sender = NetworkSender()
 		self.request_creator = RequestCreator()
 		self.client = client;
-		self.start()
+		self.message_pool = message_pool
 
 	def run(self):
 		json_data, destination = self.request_creator.poll_mixnode(self.id, self.mixnode)
@@ -21,12 +21,13 @@ class Worker(Thread):
 			sleep(0.5)
 		for entry in response:
 				msg = entry['delta']
-				print(self.client.recoverMessage(msg, entry['myid']))
+				recoveredMessage = self.client.recoverMessage(msg, entry['myid'])
+				self.message_pool[str(recoveredMessage[0])] = recoveredMessage[1]
 
 class ClientPoller():
 	def __init__(self):
 		pass
 
-	def poll_with(self, description, client):
+	def poll_with(self, description, client, messages):
 		myid, mixnode = description
-		Worker(myid, mixnode, client)
+		return Worker(myid, mixnode, client, messages)
