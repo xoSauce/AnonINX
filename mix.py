@@ -21,6 +21,7 @@ class MixNode():
 		self.encryptor = Encryptor(self.params.group)
 		self.db_list = None
 		self.broker_comm = BrokerCommunicator()
+		self.client_cache = {}
 
 	def getDbList(self):
 

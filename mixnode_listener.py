@@ -14,6 +14,7 @@ from network_sender import NetworkSender
 from sphinxmix.SphinxClient import Relay_flag, Dest_flag, Surb_flag
 from broker_communicator import BrokerCommunicator
 from epspvt_utils import Debug
+from petlib.pack import encode
 class Worker(Thread):
 	def __init__(self, socket, mixnode, mix_port):
 		Thread.__init__(self)
@@ -57,11 +58,21 @@ class Worker(Thread):
 				print("RESULT {}".format(result))
 				flag, dest, myid, delta = result
 				msg = {'myid': myid, 'delta': delta}
-				json_data, dest = RequestCreator().post_msg_to_client(dest, "key", msg)
-				if Debug.dbg:
-					dest['ip'] = '0.0.0.0'
-				print(dest)
-				self.network_sender.send_data(json_data, dest)
+				# json_data, dest = RequestCreator().post_msg_to_client(dest, "key", msg)
+				# if Debug.dbg:
+				# 	dest['ip'] = '0.0.0.0'
+				self.mixnode.client_cache.setdefault(myid, []).append(msg)
+		elif data['type'] == RequestType.client_poll.value:
+			client_id = unhexlify(data['id'])
+			if client_id in self.mixnode.client_cache:
+				response = self.mixnode.client_cache.get(client_id)
+				response = encode(response)
+				print(response)
+				self.sock.send(response)
+			else:
+				self.sock.close()
+
+
 
 class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):

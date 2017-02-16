@@ -12,6 +12,7 @@ class RequestType(Enum):
 	    push_to_mix = 5
 	    push_to_db = 6
 	    push_to_client = 7
+	    client_poll = 8
 
 class PortEnum(Enum):
 		broker  = 8080
@@ -128,4 +129,19 @@ class RequestCreator():
 			'ip':destination['ip'], 
 			'port':int(destination['port'])
 		}
+		return (data_string, serialized_destination)
+
+	def poll_mixnode(self, id, destination):
+		enumPort = PortEnum
+		if Debug.dbg:
+			enumPort = PortEnumDebug
+		json_dict = {
+			'type': RequestType.client_poll.value,
+			'id': hexlify(id).decode('utf-8')
+		}
+		serialized_destination = {
+			'ip': destination,
+			'port': int(enumPort.mix.value) 
+		}
+		data_string = json.dumps(json_dict)
 		return (data_string, serialized_destination)

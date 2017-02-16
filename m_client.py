@@ -12,7 +12,7 @@ from logger import *
 from broker_communicator import BrokerCommunicator
 from encryptor import Encryptor
 from petlib.pack import encode,decode
-from client_listener import ClientListener
+from client_poller import ClientPoller
 from message_creator import MessageCreator
 class Client:
 	def __init__(self, public_key_server):
@@ -24,13 +24,15 @@ class Client:
 		self.encryptor = Encryptor(getGlobalSphinxParams().group)
 		self.surbDict = {}
 
-	def listen(self, requested_index, port):
-		self.client_listener = ClientListener(port, self)
-		self.client_listener.listen_for(requested_index)
-	
-	def recoverMessage(self, msg):
-		surbkeytuple, index = self.surbDict[msg['myid']]
-		return (index, decode(receive_surb(getGlobalSphinxParams(), surbkeytuple, msg['delta']))) 
+	def poll(self):
+		self.client_poller = ClientPoller()
+		for surbid, data in self.surbDict.items():
+			self.client_poller.poll_with((surbid, data['source']), self)
+		
+	def recoverMessage(self, msg, myid):
+		surbkeytuple = self.surbDict[myid]['surbkeytuple']
+		index = self.surbDict[myid]['index']
+		return (index, decode(receive_surb(getGlobalSphinxParams(), surbkeytuple, msg))) 
 
 	def populate_broker_lists(self, source=None):
 		if source == None:
@@ -125,7 +127,7 @@ class Client:
 				nodes_routing_backward, 
 				pks_chosen_nodes_backward, 
 				self.ip)
-			self.surbDict[surbid] = [surbkeytuple]
+			self.surbDict[surbid] = {'surbkeytuple': surbkeytuple}
 			message['nymtuple'] = nymtuple
 			# message['pk'] = self.public_key
 			message = encode(message)
@@ -135,7 +137,7 @@ class Client:
 				pks_chosen_nodes_forward, 
 				dest, 
 				json_msg)
-			return (header, delta, use_nodes_forward[0], surbid)
+			return (header, delta, use_nodes_forward[0], surbid, use_nodes_backward[-1])
 		
 		if len(self.mixnode_list) == 0:
 			print("There are no mix-nodes available.")
@@ -146,12 +148,13 @@ class Client:
 			return
 		db_dest, key = self.create_db_destination(db, portEnum.db.value)
 		message = self.create_db_message(index)
-		header, delta, first_mix, surbid = prepare_forward_message(self.mixnode_list,
+		header, delta, first_mix, surbid, mix_to_poll = prepare_forward_message(self.mixnode_list,
 			message,
 			db_dest,
 			key,
 			portEnum)
-		self.surbDict[surbid].append(index)
+		self.surbDict[surbid]['index'] = index
+		self.surbDict[surbid]['source'] = mix_to_poll
 		json_data, dest = RequestCreator().post_msg_to_mix(
 			{'ip': first_mix, 'port': portEnum.mix.value},
 			{'header': header, 'delta': delta}
@@ -193,11 +196,9 @@ def main():
 		messages = messageCreator.generate_messages(requested_index, requested_db, 10, portEnum, pir_xor = True)
 	else:
 		messages = messageCreator.generate_messages(requested_index, requested_db, 10, portEnum, pir_xor = False)
-	print(messages)
 	network_sender = NetworkSender()
 	for db in messages:
 		[network_sender.send_data(json, dest) for json,dest in messages[db]]	
-	client.listen(requested_index, portEnum.client.value)
-	
+	client.poll()
 if __name__ == '__main__':
 	main()
