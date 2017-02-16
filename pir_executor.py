@@ -40,6 +40,11 @@ class PIRExecutor():
 				return v
 
 	def stringXorer(self, a, b):
+		if type(a) is str:
+			a = a.encode('utf-8')
+		if type(b) is str:
+			b = b.encode('utf-8')
+			
 		array_a = array.array('B', a)
 		array_b = array.array('B', b)
 		while(len(array_a) < len(array_b)):

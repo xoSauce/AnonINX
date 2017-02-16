@@ -26,9 +26,9 @@ def test_PIR_xorer():
 		b = 'GoodbyeCruelWorld'
 		result = pir_executor.stringXorer(a,b)
 		result2 = pir_executor.stringXorer(result, b).split(b'\0', 1)[0]
-		assert result2 == a
+		assert result2.decode() == a
 		result3 = pir_executor.stringXorer(result, a).split(b'\0', 1)[0]
-		assert result3 == b
+		assert result3.decode() == b
 
 def test_PIR_xorer_list():
 	messages = {
@@ -47,7 +47,7 @@ def test_PIR_xorer_list():
 		for m in range(1, len(messages)):
 			message = pir_executor.stringXorer(message, messages[m])
 	message = message.split(b'\0', 1)[0]
-	assert message == 'Real'
+	assert message.decode() == 'Real'
 
 	messages = {
 		0: 'FakeBlahBlah',
@@ -64,7 +64,7 @@ def test_PIR_xorer_list():
 			message = pir_executor.stringXorer(message, messages[m])
 
 	message = message.split(b'\0', 1)[0]
-	assert message == ''
+	assert message.decode() == ''
 
 def test_PIR_protocol():
 	messages = {
@@ -93,4 +93,4 @@ def test_PIR_protocol():
 		for i in range(1, len(db_returns)):
 			actual_message = pir_executor.stringXorer(actual_message, db_returns[i])
 		actual_message = actual_message.split(b'\0', 1)[0]
-		assert(actual_message == messages[index])
+		assert(actual_message.decode() == messages[index])
