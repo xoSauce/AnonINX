@@ -69,6 +69,7 @@ class Worker(Thread):
 				response = encode(response)
 				print(response)
 				self.sock.send(response)
+				self.mixnode.client_cache.pop()
 			else:
 				self.sock.close()
 
