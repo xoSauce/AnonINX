@@ -13,6 +13,7 @@ class RequestType(Enum):
 	    push_to_db = 6
 	    push_to_client = 7
 	    client_poll = 8
+	    get_db_size = 9
 
 class PortEnum(Enum):
 		broker  = 8080
@@ -76,11 +77,7 @@ class RequestCreator():
 		return (data_string, serialized_destination)
 
 	def post_msg_to_db(self, destination, data):
-		request = {
-			'type': RequestType.push_to_db.value,
-			'payload': data
-		}
-		data_string = json.dumps(request)
+		data_string = json.dumps(data)
 		serialized_destination = {
 			'ip': destination[0],
 			'key': destination[1],

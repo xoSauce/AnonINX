@@ -66,8 +66,7 @@ class Worker(Thread):
 			client_id = unhexlify(data['id'])
 			if client_id in self.mixnode.client_cache:
 				response = self.mixnode.client_cache.get(client_id)
-				response = encode(response)
-				print(response)
+				response = encode({"id": client_id, "response": response})
 				self.sock.send(response)
 				self.mixnode.client_cache.pop(client_id)
 			else:

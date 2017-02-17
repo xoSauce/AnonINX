@@ -54,11 +54,15 @@ class DbNode():
 		return self.ip
 	
 	def decrypt(self, iv, text, pk, tag):
-		from binascii import unhexlify
-		print (self.private_key)
 		msg = self.encryptor.decrypt_aes_gcm((pk, iv, text, tag), self.private_key[1])
 		return msg
-	
+
+	def encrypt(self, msg, client_key):
+		g_x, iv, ciphertext, tag = self.encryptor.encrypt_aes_gcm(msg, client_key, os.urandom(16))
+		encrypted_reply = {'pk': g_x, 'iv': iv, 'text': ciphertext, 'tag': tag}
+		print("IV {}, TEXT {}, PK {}, TAG {}".format(iv, ciphertext, g_x, tag))
+		return encrypted_reply
+
 	def xor_records(self, mlist):
 		records = self.getRecords()
 		for row in mlist:
@@ -74,9 +78,12 @@ class DbNode():
 	def getRecords(self):
 		return self.records
 
-	def fetch_answer(self, msg, pir_xor):
+	def getRecordsSize(self):
+		return len(self.records['collection'])
+	
+	def fetch_answer(self, msg):
 		db_cache = self.getRecords()['collection']
-		print (db_cache)
+		pir_xor = msg['pir_xor']
 		if not pir_xor:
 			index = msg['index']
 			return db_cache[index]

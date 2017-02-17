@@ -10,7 +10,7 @@ def test_encryptor_encrypt_decrypt():
 	params = SphinxParams()
 	group = params.group
 	encryptor = Encryptor(group)
-	msg = hexlify(str(2).encode())
+	msg = hexlify(str(11).encode())
 	session_name = os.urandom(16)
 	## Alice
 	pk, sk = encryptor.keyGenerate('test')
@@ -19,5 +19,5 @@ def test_encryptor_encrypt_decrypt():
 	## Alice
 	msg_decrypted = encryptor.decrypt_aes_gcm(
 		(public_key_expon, iv, ciphertext, tag), 
-		sk[1])
+		sk.x)
 	assert(msg_decrypted == msg)

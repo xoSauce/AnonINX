@@ -4,7 +4,7 @@ from os import urandom
 from binascii import hexlify, unhexlify
 from sphinxmix.SphinxClient import pki_entry, Nenc
 from sphinxmix.SphinxClient import rand_subset, create_forward_message, create_surb, receive_surb
-from request_creator import RequestCreator, PortEnum, PortEnumDebug
+from request_creator import RequestCreator, RequestType, PortEnum, PortEnumDebug
 from network_sender import NetworkSender
 from epspvt_utils import getGlobalSphinxParams, Debug, getPublicIp
 from petlib.ec import EcPt
@@ -25,6 +25,11 @@ class Client:
 		self.encryptor = Encryptor(getGlobalSphinxParams().group)
 		self.surbDict = {}
 
+	def getDBRecordSize(self, portEnum, network_sender):
+		json_data, dest = self.package_message(0, 0, False, portEnum, RequestType.get_db_size.value)
+		network_sender.send_data(json_data, dest)
+		return self.poll_recordSize(0)
+
 	def xor(self, messages):
 		pir_executor = PIRExecutor()
 		message = messages[0]
@@ -32,7 +37,32 @@ class Client:
 			message = pir_executor.stringXorer(message, m)
 		return message.decode().strip()
 
-	def poll(self, pir, requested_index):
+	def decrypt(self, cipher, private_key):
+		print(cipher)
+		iv = cipher['iv']
+		text = cipher['text']
+		pk = cipher['pk']
+		tag = cipher['tag']
+		msg = self.encryptor.decrypt_aes_gcm((pk, iv, text, tag), private_key)
+		return msg
+
+	def poll_recordSize(self, DummyIndex):
+		self.client_poller = ClientPoller()
+		messages = {}
+		threads = []
+		for surbid, data in self.surbDict.items():
+			threads.append(self.client_poller.poll_with((surbid, data['source']), self, messages))
+		for t in threads:
+			t.start()
+		for t in threads:
+			t.join()
+		### First one is the record size
+		surbid = list(self.surbDict.keys())[0]
+		self.surbDict = {}
+		record_size = decode(self.decrypt(messages[surbid][1], self.private_key[1]))
+		return record_size
+
+	def poll_index(self, pir, requested_index):
 		self.client_poller = ClientPoller()
 		threads = []
 		messages = {}
@@ -42,10 +72,22 @@ class Client:
 			t.start()
 		for t in threads:
 			t.join()
+
+		decrypted_msgs = []
+		if not pir:
+			decrypted_msgs = {}
+
+		for surbid, _ in self.surbDict.items():
+			msg = self.surbDict[surbid]
+			decrypted_msg = decode(self.decrypt(messages[surbid][1], msg['key'][1]))
+			if pir:
+				decrypted_msgs.append(decrypted_msg.encode())
+			else:
+				decrypted_msgs[messages[surbid][0]] = decrypted_msg
 		if pir:
-			return self.xor(list(messages.values()))
+			return self.xor(decrypted_msgs)
 		else:
-			return messages[str(requested_index)].strip()
+			return decrypted_msgs[requested_index].strip()
 		
 	def recoverMessage(self, msg, myid):
 		surbkeytuple = self.surbDict[myid]['surbkeytuple']
@@ -53,7 +95,7 @@ class Client:
 		return (index, decode(receive_surb(getGlobalSphinxParams(), surbkeytuple, msg))) 
 
 	def populate_broker_lists(self, source=None):
-		if source == None:
+		if source == None:	
 			source = self.public_key_server
 
 		def unhexlify_values(a_dict):
@@ -83,10 +125,12 @@ class Client:
 		self.mixnode_list = get_mixnode_list(source, self)
 		self.db_list = get_db_list(source, self)
 
-	def create_db_message(self, index, additional_data = None):
+	def create_db_message(self, index, settings):
 		msg = {
 				'index': index,
-				'additional_data': additional_data,
+				'pir_xor' : settings['pir_xor'],
+				'request_type': settings['request_type'],
+				'pk': settings['pk'],
 				'nymtuple': None
 			}
 		return msg
@@ -100,7 +144,7 @@ class Client:
 		except Exception as e:
 			raise Exception('Requested database not present or named incorrectly. {} not found'.format(destination))
 	
-	def package_message(self, index, db, pir_xor, portEnum, mix_subset = 5, session_name = None):
+	def package_message(self, index, db, pir_xor, portEnum, request_type = RequestType.push_to_db.value, mix_subset = 5, session_name = None):
 
 		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
 		self.session_name = session_name
@@ -108,7 +152,7 @@ class Client:
 		def json_encode(arguments):
 			return json.dumps(dict(arguments))
 
-		def prepareDBPayload(msg, key, session_name):
+		def encryptForDB(msg, key, session_name):
 			group = getGlobalSphinxParams().group
 			g_x, iv, ciphertext, tag = self.encryptor.encrypt_aes_gcm(
 				msg
@@ -120,7 +164,6 @@ class Client:
 				,'iv': hexlify(iv).decode('utf-8')
 				,'text': hexlify(ciphertext).decode('utf-8')
 				,'tag' : hexlify(tag).decode('utf-8')
-				,'pir_method': pir_xor
 			}
 			json_msg = json.dumps(e_message, ensure_ascii=False)
 			return (json_msg)
@@ -147,9 +190,8 @@ class Client:
 				self.ip)
 			self.surbDict[surbid] = {'surbkeytuple': surbkeytuple}
 			message['nymtuple'] = nymtuple
-			# message['pk'] = self.public_key
 			message = encode(message)
-			json_msg = prepareDBPayload(message, key, self.session_name)
+			json_msg = encryptForDB(message, key, self.session_name)
 			header, delta =  create_forward_message(params, 
 				nodes_routing_forward, 
 				pks_chosen_nodes_forward, 
@@ -165,7 +207,7 @@ class Client:
 			print("There are no databases available.")
 			return
 		db_dest, key = self.create_db_destination(db, portEnum.db.value)
-		message = self.create_db_message(index)
+		message = self.create_db_message(index, {'pir_xor': pir_xor, 'request_type': request_type, 'pk': self.public_key})
 		header, delta, first_mix, surbid, mix_to_poll = prepare_forward_message(self.mixnode_list,
 			message,
 			db_dest,
@@ -173,6 +215,7 @@ class Client:
 			portEnum)
 		self.surbDict[surbid]['index'] = index
 		self.surbDict[surbid]['source'] = mix_to_poll
+		self.surbDict[surbid]['key'] = self.private_key
 		json_data, dest = RequestCreator().post_msg_to_mix(
 			{'ip': first_mix, 'port': portEnum.mix.value},
 			{'header': header, 'delta': delta}
@@ -209,14 +252,15 @@ def main():
 	db = int(args['database'])
 	requested_index, requested_db = (index, db)
 	messageCreator = MessageCreator(client)
-
-	if args['xor']:
-		messages = messageCreator.generate_messages(requested_index, requested_db, 10, portEnum, pir_xor = True)
-	else:
-		messages = messageCreator.generate_messages(requested_index, requested_db, 10, portEnum, pir_xor = False)
 	network_sender = NetworkSender()
+	record_size = client.getDBRecordSize(portEnum, network_sender)
+	print(record_size)
+	if args['xor']:
+		messages = messageCreator.generate_messages(requested_index, requested_db, record_size, portEnum, pir_xor = True)
+	else:
+		messages = messageCreator.generate_messages(requested_index, requested_db, record_size, portEnum, pir_xor = False)
 	for db in messages:
 		[network_sender.send_data(json, dest) for json,dest in messages[db]]	
-	print(client.poll(args['xor'], requested_index), requested_index)
+	print(client.poll_index(args['xor'], requested_index), requested_index)
 if __name__ == '__main__':
 	main()

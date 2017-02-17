@@ -26,31 +26,31 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
-		data = json.loads(self.sock.recv(1024).decode())
-		if data['type'] == RequestType.push_to_db.value:
-			data = json.loads(data['payload'])
-			iv = unhexlify(data["iv"].encode())
-			text = unhexlify(data["text"].encode())
-			pk = EcPt.from_binary(unhexlify(data["pk"].encode()), getGlobalSphinxParams().group.G)
-			tag = unhexlify(data["tag"].encode())
-			pir_method = data["pir_method"]
-			decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
-			try:
-				###TODO encrypt for destination
-				answer = self.dbnode.fetch_answer(decrypted_msg, pir_method)
-				nymtuple = decrypted_msg['nymtuple']
-				first_node = decode(nymtuple[0])
-				reply = encode(answer)
-				header,delta = package_surb(getGlobalSphinxParams(), nymtuple, reply)
-				print("DELTA_DB {}".format(delta))
-				mix_list = self.dbnode.get_mixnode_list()
-				json_data, dest = RequestCreator().post_msg_to_mix(
-					{'ip': first_node[1], 'port': self.mixport},
-					{'header': header, 'delta': delta}
-				)
-				self.network_sender.send_data(json_data, dest)
-			except Exception as e:
-				raise e
+		data = json.loads(json.loads(self.sock.recv(1024).decode()))
+		iv = unhexlify(data["iv"].encode())
+		text = unhexlify(data["text"].encode())
+		pk = EcPt.from_binary(unhexlify(data["pk"].encode()), getGlobalSphinxParams().group.G)
+		tag = unhexlify(data["tag"].encode())
+		decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
+		request_type = decrypted_msg['request_type']
+		client_pk = decrypted_msg['pk'][2]	
+		if request_type == RequestType.get_db_size.value:
+			record_size = self.dbnode.getRecordsSize()
+			reply = encode(record_size)
+		elif request_type == RequestType.push_to_db.value:
+			answer = self.dbnode.fetch_answer(decrypted_msg)
+			reply = encode(answer)
+		
+		encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
+		nymtuple = decrypted_msg['nymtuple']
+		first_node = decode(nymtuple[0])
+		header, delta = package_surb(getGlobalSphinxParams(), nymtuple, encrypted_reply)
+		mix_list = self.dbnode.get_mixnode_list()
+		json_data, dest = RequestCreator().post_msg_to_mix(
+			{'ip': first_node[1], 'port': self.mixport},
+			{'header': header, 'delta': delta}
+		)
+		self.network_sender.send_data(json_data, dest)
 
 class DBListener(GenericListener):
 	def __init__(self, db_port, mixport, dbnode):
