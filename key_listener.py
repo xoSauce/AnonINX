@@ -38,8 +38,8 @@ class KeyListener(GenericListener):
 		super().__init__(port)
 		self.broker = broker
 
-	def listen(self):
-		super().listen()
+	def run(self):
+		super().run()
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()

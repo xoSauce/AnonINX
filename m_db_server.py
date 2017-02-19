@@ -26,7 +26,7 @@ def main():
 	dbNode = DbNode(broker_config)
 	response = dbNode.publish_key()
 	dbListener = DBListener(portEnum.db.value, portEnum.mix.value, dbNode)
-	dbListener.listen()
+	dbListener.run()
 
 if __name__ == '__main__':
 	main()

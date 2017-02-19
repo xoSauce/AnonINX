@@ -51,16 +51,14 @@ class Worker(Thread):
 			elif result[0] == Dest_flag:
 				flag, msg, dest, _ = result
 				json_data, dest = RequestCreator().post_msg_to_db(dest, msg)
-				if Debug.dbg:
-					dest['ip'] = '0.0.0.0'
-				self.network_sender.send_data(json_data, dest)
+				self.mixnode.pool_item((json_data, dest))
+				# if Debug.dbg:
+				# 	dest['ip'] = '0.0.0.0'
+				# self.network_sender.send_data(json_data, dest)
 			elif result[0] == Surb_flag:
 				print("RESULT {}".format(result))
 				flag, dest, myid, delta = result
 				msg = {'myid': myid, 'delta': delta}
-				# json_data, dest = RequestCreator().post_msg_to_client(dest, "key", msg)
-				# if Debug.dbg:
-				# 	dest['ip'] = '0.0.0.0'
 				self.mixnode.client_cache.setdefault(myid, []).append(msg)
 		elif data['type'] == RequestType.client_poll.value:
 			client_id = unhexlify(data['id'])
@@ -79,8 +77,8 @@ class MixNodeListener(GenericListener):
 		super().__init__(port)
 		self.mixnode = mixnode
 	
-	def listen(self):
-		super().listen()
+	def run(self):
+		super().run()
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()

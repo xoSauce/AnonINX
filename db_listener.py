@@ -58,8 +58,8 @@ class DBListener(GenericListener):
 		self.dbnode = dbnode
 		self.mixport = mixport
 	
-	def listen(self):
-		super().listen()
+	def run(self):
+		super().run()
 		try:
 			while 1:
 				clientsocket, address = self.serversocket.accept()

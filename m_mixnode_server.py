@@ -1,6 +1,7 @@
 from mix import MixNode
 from epspvt_utils import Debug
 from mixnode_listener import MixNodeListener
+from mixnode_sender import MixNodeSender
 from logger import *
 from request_creator import PortEnum, PortEnumDebug
 import argparse
@@ -23,11 +24,12 @@ def main():
 		Debug.dbg = True
 		portEnum = PortEnumDebug
 
-
-	mixNode = MixNode(broker_config)
+	mixNode = MixNode(broker_config, 3)
 	response = mixNode.publish_key()
 	mixNodeListener = MixNodeListener(portEnum.mix.value, mixNode)
-	mixNodeListener.listen()
+	mixNodeListener.start()
+	mixNodeSender = MixNodeSender(mixNode.mix_pool)
+	mixNodeSender.start()
 
 if __name__ == '__main__':
 	main()

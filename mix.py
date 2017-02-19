@@ -9,9 +9,10 @@ from request_creator import RequestCreator
 from encryptor import Encryptor
 from broker_communicator import BrokerCommunicator
 from binascii import unhexlify
+from mix_pool import MixPool
 class MixNode():
 
-	def __init__(self, broker_config):
+	def __init__(self, broker_config, pool_size = 3):
 		self.private_key = None
 		self.public_key = None
 		self.ip = None
@@ -22,6 +23,10 @@ class MixNode():
 		self.db_list = None
 		self.broker_comm = BrokerCommunicator()
 		self.client_cache = {}
+		self.mix_pool = MixPool(pool_size)
+
+	def pool_item(self, item):
+		self.mix_pool.addInPool(item)
 
 	def getDbList(self):
 
