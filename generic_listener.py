@@ -12,7 +12,7 @@ class GenericListener(Thread):
         self.serversocket.listen(5)
 
     def run(self):
-        log_debug('server listening on {}'.format(self.port))   
+        log_debug('server listening on {}'.format(self.port))
         pass
 
 if __name__ == '__main__':

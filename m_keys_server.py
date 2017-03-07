@@ -1,11 +1,62 @@
 from broker import Broker
 from key_listener import KeyListener
 from request_creator import PortEnum
+from threading import Thread
+import subprocess as sp
+import time
+import sys
+class StatusChecker(Thread):
+	def __init__(self,broker):
+		Thread.__init__(self)
+		self.broker = broker
+		pass
+
+	def isAlive(self, ip):
+	    status,result = sp.getstatusoutput("ping -c1 -w2 " + str(ip))
+	    if status == 0:
+	        return 1
+
+	def delete_unresponse_mixes(self):
+		broker = self.broker
+		remove_mix = []
+		remove_db = []
+		for entry in broker.mix_public_keys:
+			if not self.isAlive(entry):
+				remove_mix.append(entry)
+
+		for entry in broker.db_public_keys:
+			if not self.isAlive(entry):
+				remove_db.append(entry)
+
+		for entry in remove_mix:
+			del broker.mix_public_keys[entry]
+
+		for entry in remove_db:
+			del broker.db_public_keys[entry]
+
+		print("Mixnodes", broker.mix_public_keys)
+		print("Dbs", broker.db_public_keys)
+
+	def kill(self):
+		self.work = False
+
+	def run(self):
+		self.work = True
+		while self.work:
+			self.delete_unresponse_mixes()
+			time.sleep(5)
+
 def main():
 	portEnum = PortEnum
 	broker = Broker()
-	key_listener = KeyListener(portEnum.broker.value, broker)
-	key_listener.run()
+	status = StatusChecker(broker)
+	try:
+		status.start()
+		key_listener = KeyListener(portEnum.broker.value, broker)
+		key_listener.run()
+	except:
+		status.kill()
+
 
 if __name__ == '__main__':
     main()

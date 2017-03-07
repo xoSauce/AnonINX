@@ -88,14 +88,14 @@ class Client:
 			return self.xor(decrypted_msgs)
 		else:
 			return decrypted_msgs[requested_index].strip()
-		
+
 	def recoverMessage(self, msg, myid):
 		surbkeytuple = self.surbDict[myid]['surbkeytuple']
 		index = self.surbDict[myid]['index']
-		return (index, decode(receive_surb(getGlobalSphinxParams(), surbkeytuple, msg))) 
+		return (index, decode(receive_surb(getGlobalSphinxParams(), surbkeytuple, msg)))
 
 	def populate_broker_lists(self, source=None):
-		if source == None:	
+		if source == None:
 			source = self.public_key_server
 
 		def unhexlify_values(a_dict):
@@ -143,7 +143,7 @@ class Client:
 			return (destination, key)
 		except Exception as e:
 			raise Exception('Requested database not present or named incorrectly. {} not found'.format(destination))
-	
+
 	def package_message(self, index, db, pir_xor, portEnum, request_type = RequestType.push_to_db.value, mix_subset = 5, session_name = None):
 
 		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
@@ -170,35 +170,35 @@ class Client:
 
 		def prepare_forward_message(mixnodes_dict, message, dest, key, portEnum):
 			params = getGlobalSphinxParams()
-			group = params.group.G	
+			group = params.group.G
 			use_nodes_forward = rand_subset(mixnodes_dict.keys(), 5)
 			use_nodes_backward = rand_subset(mixnodes_dict.keys(), 5)
 			nodes_routing_forward = list(map(Nenc, use_nodes_forward))
 			nodes_routing_backward = list(map(Nenc, use_nodes_backward))
 			pks_chosen_nodes_forward = [
-				EcPt.from_binary(mixnodes_dict[key], group) 
+				EcPt.from_binary(mixnodes_dict[key], group)
 				for key in use_nodes_forward
 			]
 			pks_chosen_nodes_backward = [
-				EcPt.from_binary(mixnodes_dict[key], group) 
+				EcPt.from_binary(mixnodes_dict[key], group)
 				for key in use_nodes_backward
 			]
 			surbid, surbkeytuple, nymtuple = create_surb(
-				params, 
-				nodes_routing_backward, 
-				pks_chosen_nodes_backward, 
+				params,
+				nodes_routing_backward,
+				pks_chosen_nodes_backward,
 				self.ip)
 			self.surbDict[surbid] = {'surbkeytuple': surbkeytuple}
 			message['nymtuple'] = nymtuple
 			message = encode(message)
 			json_msg = encryptForDB(message, key, self.session_name)
-			header, delta =  create_forward_message(params, 
-				nodes_routing_forward, 
-				pks_chosen_nodes_forward, 
-				dest, 
+			header, delta =  create_forward_message(params,
+				nodes_routing_forward,
+				pks_chosen_nodes_forward,
+				dest,
 				json_msg)
 			return (header, delta, use_nodes_forward[0], surbid, use_nodes_backward[-1])
-		
+
 		if len(self.mixnode_list) == 0:
 			print("There are no mix-nodes available.")
 			return
@@ -223,7 +223,7 @@ class Client:
 		if Debug.dbg is True:
 			dest['ip'] = b'0.0.0.0'
 		return (json_data, dest)
-		
+
 def parse():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-d', '--debug', action= "store_true", help = "Debug Mode -- to be able to connect to own computer via local ip (skip public ip connection)")
@@ -254,13 +254,12 @@ def main():
 	messageCreator = MessageCreator(client)
 	network_sender = NetworkSender()
 	record_size = client.getDBRecordSize(portEnum, network_sender)
-	print(record_size)
 	if args['xor']:
 		messages = messageCreator.generate_messages(requested_index, requested_db, record_size, portEnum, pir_xor = True)
 	else:
 		messages = messageCreator.generate_messages(requested_index, requested_db, record_size, portEnum, pir_xor = False)
 	for db in messages:
-		[network_sender.send_data(json, dest) for json,dest in messages[db]]	
-	print(client.poll_index(args['xor'], requested_index), requested_index)
+		[network_sender.send_data(json, dest) for json,dest in messages[db]]
+	print("POLL_INDEX RESULT:", client.poll_index(args['xor'], requested_index), "REQUESTED_INDEX", requested_index)
 if __name__ == '__main__':
 	main()
