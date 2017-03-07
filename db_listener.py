@@ -39,6 +39,8 @@ class Worker(Thread):
 		if request_type == RequestType.get_db_size.value:
 			record_size = self.dbnode.getRecordsSize()
 			reply = encode(record_size)
+			self.sock.send(reply)
+			return
 		elif request_type == RequestType.push_to_db.value:
 			answer = self.dbnode.fetch_answer(decrypted_msg)
 			reply = encode(answer)
