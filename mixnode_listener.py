@@ -47,6 +47,7 @@ class Worker(Thread):
 					{'ip': addr, 'port': self.mix_port},
 					{'header': header, 'delta': delta}
 				)
+				##TODO: POOL AT EVREY STEP !!
 				self.network_sender.send_data(json_data, dest)
 			elif result[0] == Dest_flag:
 				flag, msg, dest, _ = result

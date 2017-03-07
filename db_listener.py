@@ -26,21 +26,23 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
-		data = json.loads(json.loads(self.sock.recv(1024).decode()))
+		raw = self.sock.recv(1024).decode()
+		print(raw)
+		data = json.loads(raw)
 		iv = unhexlify(data["iv"].encode())
 		text = unhexlify(data["text"].encode())
 		pk = EcPt.from_binary(unhexlify(data["pk"].encode()), getGlobalSphinxParams().group.G)
 		tag = unhexlify(data["tag"].encode())
 		decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
 		request_type = decrypted_msg['request_type']
-		client_pk = decrypted_msg['pk'][2]	
+		client_pk = decrypted_msg['pk'][2]
 		if request_type == RequestType.get_db_size.value:
 			record_size = self.dbnode.getRecordsSize()
 			reply = encode(record_size)
 		elif request_type == RequestType.push_to_db.value:
 			answer = self.dbnode.fetch_answer(decrypted_msg)
 			reply = encode(answer)
-		
+
 		encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
 		nymtuple = decrypted_msg['nymtuple']
 		first_node = decode(nymtuple[0])
@@ -57,7 +59,7 @@ class DBListener(GenericListener):
 		super().__init__(db_port)
 		self.dbnode = dbnode
 		self.mixport = mixport
-	
+
 	def run(self):
 		super().run()
 		try:

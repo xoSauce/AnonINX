@@ -25,10 +25,31 @@ class Client:
 		self.encryptor = Encryptor(getGlobalSphinxParams().group)
 		self.surbDict = {}
 
+	def encryptForDB(self, msg, key, session_name):
+		group = getGlobalSphinxParams().group
+		g_x, iv, ciphertext, tag = self.encryptor.encrypt_aes_gcm(
+			msg
+			,key
+			,session_name
+		)
+		e_message = {
+			'pk': hexlify(g_x.export()).decode('utf-8')
+			,'iv': hexlify(iv).decode('utf-8')
+			,'text': hexlify(ciphertext).decode('utf-8')
+			,'tag' : hexlify(tag).decode('utf-8')
+		}
+		json_msg = json.dumps(e_message, ensure_ascii=False)
+		return (json_msg)
+
 	def getDBRecordSize(self, portEnum, network_sender):
-		json_data, dest = self.package_message(0, 0, False, portEnum, RequestType.get_db_size.value)
-		network_sender.send_data(json_data, dest)
-		return self.poll_recordSize(0)
+		session_name = os.urandom(16)
+		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
+		db_dest, key = self.create_db_destination(0, portEnum.db.value)
+		message = encode(self.create_db_message(None, {'pir_xor': None, 'request_type': RequestType.get_db_size.value, 'pk': self.public_key}))
+		print(db_dest, message)
+		json_msg = self.encryptForDB(message, key, session_name)
+		network_sender.send_data_wait_long_response(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
+
 
 	def xor(self, messages):
 		pir_executor = PIRExecutor()
@@ -152,22 +173,6 @@ class Client:
 		def json_encode(arguments):
 			return json.dumps(dict(arguments))
 
-		def encryptForDB(msg, key, session_name):
-			group = getGlobalSphinxParams().group
-			g_x, iv, ciphertext, tag = self.encryptor.encrypt_aes_gcm(
-				msg
-				,key
-				,session_name
-			)
-			e_message = {
-				'pk': hexlify(g_x.export()).decode('utf-8')
-				,'iv': hexlify(iv).decode('utf-8')
-				,'text': hexlify(ciphertext).decode('utf-8')
-				,'tag' : hexlify(tag).decode('utf-8')
-			}
-			json_msg = json.dumps(e_message, ensure_ascii=False)
-			return (json_msg)
-
 		def prepare_forward_message(mixnodes_dict, message, dest, key, portEnum):
 			params = getGlobalSphinxParams()
 			group = params.group.G
@@ -191,7 +196,7 @@ class Client:
 			self.surbDict[surbid] = {'surbkeytuple': surbkeytuple}
 			message['nymtuple'] = nymtuple
 			message = encode(message)
-			json_msg = encryptForDB(message, key, self.session_name)
+			json_msg = self.encryptForDB(message, key, self.session_name)
 			header, delta =  create_forward_message(params,
 				nodes_routing_forward,
 				pks_chosen_nodes_forward,
