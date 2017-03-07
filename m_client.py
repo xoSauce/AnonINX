@@ -48,7 +48,7 @@ class Client:
 		message = encode(self.create_db_message(None, {'pir_xor': None, 'request_type': RequestType.get_db_size.value, 'pk': self.public_key}))
 		print(db_dest, message)
 		json_msg = self.encryptForDB(message, key, session_name)
-		network_sender.send_data_wait_long_response(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
+		return network_sender.send_data_wait_long_response(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
 
 
 	def xor(self, messages):
