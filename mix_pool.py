@@ -8,6 +8,9 @@ class MixPool:
 		self.SLEEP_TIME = 0.5
 		self.lock = threading.Lock()
 
+	def getContents(self):
+		return self.pool
+
 	def getSelection(self, selection_size = None):
 		self.lock.acquire()
 		try:
@@ -27,4 +30,3 @@ class MixPool:
 
 	def addInPool(self, item):
 		self.pool.append(item)
-

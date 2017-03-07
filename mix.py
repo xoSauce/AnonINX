@@ -1,6 +1,6 @@
 import sys
 import os
-from sphinxmix.SphinxParams import SphinxParams	
+from sphinxmix.SphinxParams import SphinxParams
 from sphinxmix.SphinxNode import sphinx_process
 from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, Surb_flag, receive_forward
 from epspvt_utils import getPublicIp, getGlobalSphinxParams
@@ -26,6 +26,7 @@ class MixNode():
 		self.mix_pool = MixPool(pool_size)
 
 	def pool_item(self, item):
+		print("CONTENTS_IN_POOL ON ADD", mix_pool.getContents())
 		self.mix_pool.addInPool(item)
 
 	def getDbList(self):
@@ -45,7 +46,7 @@ class MixNode():
 			for index, (key,value) in enumerate(dbs_dict_raw.items()):
 				dbs_dict['DB{}'.format(index)] = (key, value)
 			return dbs_dict
-		
+
 		if self.db_list == None:
 			source = {
 				'ip': self.broker_config['pkserver'],
@@ -80,8 +81,8 @@ class MixNode():
 		#publish key
 		response = self.network_sender.send_data_wait(json_data, destination)
 		return response
-		
-	
+
+
 	def getIp(self):
 		if self.ip is None:
 			self.ip = getPublicIp()
@@ -92,7 +93,6 @@ class MixNode():
 		ret = sphinx_process(self.params, private_key.x, header, delta)
 		(tag, info, (header, delta)) = ret
 		routing = PFdecode(self.params, info)
-		print(routing)
 		if routing[0] == Relay_flag:
 			flag, addr = routing
 			return (Relay_flag, addr, header, delta)

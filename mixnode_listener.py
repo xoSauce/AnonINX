@@ -56,7 +56,6 @@ class Worker(Thread):
 				# 	dest['ip'] = '0.0.0.0'
 				# self.network_sender.send_data(json_data, dest)
 			elif result[0] == Surb_flag:
-				print("RESULT {}".format(result))
 				flag, dest, myid, delta = result
 				msg = {'myid': myid, 'delta': delta}
 				self.mixnode.client_cache.setdefault(myid, []).append(msg)
@@ -76,7 +75,7 @@ class MixNodeListener(GenericListener):
 	def __init__(self, port, mixnode):
 		super().__init__(port)
 		self.mixnode = mixnode
-	
+
 	def run(self):
 		super().run()
 		try:
