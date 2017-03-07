@@ -28,7 +28,8 @@ class Worker(Thread):
 	def run(self):
 		raw = self.sock.recv(1024).decode()
 		print("RAW", raw)
-		data = json.loads(raw)
+		while type(data) == 'str':
+			data = json.loads(raw)
 		print("LOADED", data, type(data))
 		iv = unhexlify(data["iv"].encode())
 		text = unhexlify(data["text"].encode())
