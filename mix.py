@@ -1,5 +1,6 @@
 import sys
 import os
+import threading
 from sphinxmix.SphinxParams import SphinxParams
 from sphinxmix.SphinxNode import sphinx_process
 from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, Surb_flag, receive_forward
@@ -10,6 +11,7 @@ from encryptor import Encryptor
 from broker_communicator import BrokerCommunicator
 from binascii import unhexlify
 from mix_pool import MixPool
+
 class MixNode():
 
 	def __init__(self, broker_config, pool_size = 3):
@@ -24,6 +26,11 @@ class MixNode():
 		self.broker_comm = BrokerCommunicator()
 		self.client_cache = {}
 		self.mix_pool = MixPool(pool_size)
+		self.print_cache()
+
+	def print_cache(self):
+		threading.Timer(5, self.print_cache).start()
+		print ("Cache:", self.client_cache)
 
 	def pool_item(self, item):
 		print("CONTENTS_IN_POOL ON ADD", self.mix_pool.getContents())
