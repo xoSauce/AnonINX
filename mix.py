@@ -26,7 +26,7 @@ class MixNode():
 		self.mix_pool = MixPool(pool_size)
 
 	def pool_item(self, item):
-		print("CONTENTS_IN_POOL ON ADD", mix_pool.getContents())
+		print("CONTENTS_IN_POOL ON ADD", self.mix_pool.getContents())
 		self.mix_pool.addInPool(item)
 
 	def getDbList(self):
