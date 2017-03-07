@@ -29,7 +29,7 @@ class Worker(Thread):
 		raw = self.sock.recv(1024).decode()
 		print("RAW", raw)
 		data = json.loads(raw)
-		print("LOADED", data)
+		print("LOADED", data, type(data))
 		iv = unhexlify(data["iv"].encode())
 		text = unhexlify(data["text"].encode())
 		pk = EcPt.from_binary(unhexlify(data["pk"].encode()), getGlobalSphinxParams().group.G)
