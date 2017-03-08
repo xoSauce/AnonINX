@@ -15,6 +15,7 @@ def recv_timeout_petlib_pack(the_socket, timeout=0.5):
             break
         try:
             data = the_socket.recv(1024)
+            print("DATA", data)
             if data:
                 total_data.append(data)
                 begin = time.time()
@@ -28,7 +29,7 @@ def recv_timeout_petlib_pack(the_socket, timeout=0.5):
     return decode(string)
 
 def recv_timeout(the_socket,timeout=0.5):
-    the_socket.setblocking(1)  
+    the_socket.setblocking(0)
     total_data=[];
     data='';
     begin=time.time()

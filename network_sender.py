@@ -1,10 +1,10 @@
-import socket		
+import socket
 import threading
 from socket_utils import recv_timeout_petlib_pack
 class NetworkSender():
 	def __init__(self):
 		self.lock = threading.Lock()
-	
+
 	def send_data(self, msg, destination):
 		self.lock.acquire()
 		try:
@@ -40,7 +40,9 @@ class NetworkSender():
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			s.connect((ip, port))
 			s.send(msg.encode())
+			print("sent")
 			raw = s.recv(1024)
+			print("waiting")
 			data = raw.decode()
 			s.close()
 			return data
