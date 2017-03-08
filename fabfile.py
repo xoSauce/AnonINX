@@ -47,6 +47,11 @@ def all_dbs():
 		'db4',
 	]
 
+def db_1_2():
+    env.hosts = [
+		'db1',
+        'db2'
+	]
 def db_1():
 	env.hosts = [
 		'db1'
@@ -99,9 +104,9 @@ def start_db_listener(ip, port, db_path):
     pattern = re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
     if not pattern.match(ip):
         return False
-    with virtualenv_latest():  
+    with virtualenv_latest():
         with cd(env.latest_dir):
-            run_string = "python3 m_db_server.py {} {} -db {}".format(ip,port,db_path) 
+            run_string = "python3 m_db_server.py {} {} -db {}".format(ip,port,db_path)
             run(run_string)
 @parallel
 def start_mix_listener(ip, port):
@@ -110,9 +115,9 @@ def start_mix_listener(ip, port):
         pattern = re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         if not pattern.match(ip):
             return False
-        with virtualenv_latest():  
+        with virtualenv_latest():
             with cd(env.latest_dir):
-                run("python3 m_mixnode_server.py %s %s" % (ip, port))   
+                run("python3 m_mixnode_server.py %s %s" % (ip, port))
     except ValueError:
         return False
 
