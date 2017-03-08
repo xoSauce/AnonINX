@@ -35,7 +35,7 @@ class Worker(Thread):
 		raw_data = recv_timeout(self.sock)
 		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
-			data = unhexlify(data['payload'])
+			data = decode(unhexlify(data['payload']))
 			header = data['header']
 			delta = data['delta']
 			result = self.mixnode.process(header, delta)
