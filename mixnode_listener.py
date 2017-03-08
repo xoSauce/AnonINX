@@ -27,6 +27,7 @@ class Worker(Thread):
 
 	def run(self):
 		raw_data = recv_timeout(self.sock)
+		print(raw_data)
 		data = pickle.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
 			data = decode(data['payload'])
