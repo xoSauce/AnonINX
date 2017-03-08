@@ -14,8 +14,6 @@ class NetworkSender():
 			s.connect((ip, port))
 			if type(msg).__name__ == 'str':
 				msg = msg.encode()
-			print(msg, type(msg))
-
 			s.send(msg)
 			s.close()
 		finally:
@@ -47,7 +45,6 @@ class NetworkSender():
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			s.connect((ip, port))
 			if type(msg).__name__ == 'str':
-				print("here")
 				msg = msg.encode()
 			s.send(msg)
 			raw = s.recv(1024)

@@ -26,18 +26,8 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
-		def reconstruct_header(h_0, h_1, h_2):
-			h_0 = unhexlify(h_0)
-			params = getGlobalSphinxParams()
-			group = params.group.G
-			ecPt = EcPt.from_binary(h_0, group)
-			return (ecPt, unhexlify(h_1), unhexlify(h_2))
-
 		raw_data = recv_timeout(self.sock)
-		if type(raw_data).__name__ == 'str':
-			data = json.loads(raw_data)
-		else:
-			data = pickle.loads(raw_data)
+		data = pickle.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
 			data = decode(data['payload'])
 			header = data['header']

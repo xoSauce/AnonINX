@@ -96,7 +96,7 @@ class Client:
 		decrypted_msgs = []
 		if not pir:
 			decrypted_msgs = {}
-		
+
 		for surbid, _ in self.surbDict.items():
 			msg = self.surbDict[surbid]
 			decrypted_msg = decode(self.decrypt(messages[surbid][1], msg['key'][1]))
@@ -224,6 +224,7 @@ class Client:
 			{'ip': first_mix, 'port': portEnum.mix.value},
 			{'header': header, 'delta': delta}
 		)
+		print(json_data, dest)
 		if Debug.dbg is True:
 			dest['ip'] = b'0.0.0.0'
 		return (json_data, dest)
