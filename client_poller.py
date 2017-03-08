@@ -22,6 +22,7 @@ class Worker(Thread):
 			sleep(0.5)
 		id = response['id']
 		response = response['response']
+		print(response)
 		for entry in response:
 			msg = entry['delta']
 			recoveredMessage = self.client.recoverMessage(msg, entry['myid'])

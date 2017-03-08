@@ -18,8 +18,7 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
-		print("here")
-		raw_data = recv_timeout(self.sock, timeout=0.1)
+		raw_data = recv_timeout(self.sock, timeout=1)
 		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_client.value:
 			msg = decode(unhexlify(data['payload']))
@@ -29,7 +28,7 @@ class ClientListener(GenericListener):
 	def __init__(self, port, client):
 		super().__init__(port)
 		self.client = client
-	
+
 	def listen_for(self, requested_index):
 		super().listen()
 		try:
