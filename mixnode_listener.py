@@ -15,6 +15,7 @@ from sphinxmix.SphinxClient import Relay_flag, Dest_flag, Surb_flag
 from broker_communicator import BrokerCommunicator
 from epspvt_utils import Debug
 from petlib.pack import encode
+import pickle
 class Worker(Thread):
 	def __init__(self, socket, mixnode, mix_port):
 		Thread.__init__(self)
@@ -33,7 +34,10 @@ class Worker(Thread):
 			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
 		raw_data = recv_timeout(self.sock)
-		data = json.loads(raw_data)
+		if type(raw_data).__name__ == 'str':
+			data = json.loads(raw_data)
+		else
+			data = pickle.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
 			data = decode(data['payload'])
 			header = data['header']
