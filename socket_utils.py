@@ -46,4 +46,4 @@ def recv_timeout(the_socket,timeout=2):
                 time.sleep(0.1)
         except:
             pass
-    return b''.join(total_data)
+    return ''.join(total_data)
