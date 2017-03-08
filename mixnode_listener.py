@@ -35,11 +35,9 @@ class Worker(Thread):
 		raw_data = recv_timeout(self.sock)
 		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
-			data = data['payload']
-			header = reconstruct_header(data['header_0'], data['header_1'], data['header_2'])
-			delta = unhexlify(data['delta'])
-			log_debug(header)
-			log_debug(delta)
+			data = decode(data['payload'])
+			header = data['header']
+			delta = data['delta']
 			result = self.mixnode.process(header, delta)
 			if result[0] == Relay_flag:
 				flag, addr, header, delta = result

@@ -62,12 +62,7 @@ class RequestCreator():
 	def post_msg_to_mix(self, destination, data):
 		request = {
 			'type': RequestType.push_to_mix.value,
-			'payload': {
-				'header_0': hexlify(data['header'][0].export()).decode('utf-8'),
-				'header_1': hexlify(data['header'][1]).decode('utf-8'),
-				'header_2': hexlify(data['header'][2]).decode('utf-8'),
-				'delta': hexlify(data['delta']).decode('utf-8')
-			}
+			'payload': encode(data)
 		}
 		data_string = json.dumps(request)
 		serialized_destination = {
