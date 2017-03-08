@@ -78,13 +78,13 @@ class RequestCreator():
 
 	def post_msg_to_db(self, destination, data):
 		print("TO DB:", data, type(data))
-		data_string = json.dumps(data)
+		# data_string = json.dumps(data)
 		serialized_destination = {
 			'ip': destination[0],
 			'key': destination[1],
 			'port': int(destination[2])
 		}
-		return (data_string, serialized_destination)
+		return (data, serialized_destination)
 
 	def post_msg_to_client(self, destination, key, data):
 		request = {
