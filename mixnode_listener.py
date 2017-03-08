@@ -48,14 +48,15 @@ class Worker(Thread):
 					{'header': header, 'delta': delta}
 				)
 				##TODO: POOL AT EVREY STEP !!
-				self.network_sender.send_data(json_data, dest)
+				self.mixnode.pool_item((json_data, dest))
+				# self.network_sender.send_data(json_data, dest)
 			elif result[0] == Dest_flag:
 				flag, msg, dest, _ = result
 				json_data, dest = RequestCreator().post_msg_to_db(dest, msg)
-				self.mixnode.pool_item((json_data, dest))
+				# self.mixnode.pool_item((json_data, dest))
 				# if Debug.dbg:
 				# 	dest['ip'] = '0.0.0.0'
-				# self.network_sender.send_data(json_data, dest)
+				self.network_sender.send_data(json_data, dest)
 			elif result[0] == Surb_flag:
 				flag, dest, myid, delta = result
 				msg = {'myid': myid, 'delta': delta}
