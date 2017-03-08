@@ -26,10 +26,10 @@ class MixNode():
 		self.broker_comm = BrokerCommunicator()
 		self.client_cache = {}
 		self.mix_pool = MixPool(pool_size)
-		# self.print_cache()
+		self.print_cache()
 
 	def print_cache(self):
-		threading.Timer(5, self.print_cache).start()
+		threading.Timer(10, self.print_cache).start()
 		print ("Cache:", self.client_cache)
 
 	def pool_item(self, item):
