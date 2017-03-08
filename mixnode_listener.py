@@ -33,6 +33,7 @@ class Worker(Thread):
 			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
 		raw_data = recv_timeout(self.sock, timeout=0.1)
+		print(raw_data)
 		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
 			data = data['payload']
