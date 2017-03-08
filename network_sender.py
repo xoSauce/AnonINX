@@ -25,7 +25,7 @@ class NetworkSender():
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			s.connect((ip, port))
 			s.send(msg.encode())
-			raw = recv_timeout_petlib_pack(s, timeout=1)
+			raw = recv_timeout_petlib_pack(s)
 			data = raw
 			s.close()
 			return data

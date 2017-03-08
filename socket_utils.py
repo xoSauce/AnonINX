@@ -3,7 +3,7 @@ from petlib.pack import decode
 # Credit goes to:
 # https://www.binarytides.com/receive-full-data-with-the-recv-socket-function-in-python/
 
-def recv_timeout_petlib_pack(the_socket, timeout=1):
+def recv_timeout_petlib_pack(the_socket, timeout=20):
     the_socket.setblocking(0)
     total_data=[];
     data='';
@@ -27,7 +27,7 @@ def recv_timeout_petlib_pack(the_socket, timeout=1):
         return ''
     return decode(string)
 
-def recv_timeout(the_socket,timeout=1):
+def recv_timeout(the_socket,timeout=20):
     the_socket.setblocking(0)
     total_data=[];
     data='';
