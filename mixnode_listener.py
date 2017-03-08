@@ -14,7 +14,7 @@ from network_sender import NetworkSender
 from sphinxmix.SphinxClient import Relay_flag, Dest_flag, Surb_flag
 from broker_communicator import BrokerCommunicator
 from epspvt_utils import Debug
-from petlib.pack import encode
+from petlib.pack import encode,decode
 class Worker(Thread):
 	def __init__(self, socket, mixnode, mix_port):
 		Thread.__init__(self)
