@@ -1,12 +1,12 @@
-import time 
+import time
 from petlib.pack import decode
 # Credit goes to:
 # https://www.binarytides.com/receive-full-data-with-the-recv-socket-function-in-python/
 
 def recv_timeout_petlib_pack(the_socket, timeout=0.5):
-    the_socket.setblocking(0)  
+    the_socket.setblocking(0)
     total_data=[];
-    data=''; 
+    data='';
     begin=time.time()
     while 1:
         if total_data and time.time()-begin > timeout:
@@ -21,16 +21,16 @@ def recv_timeout_petlib_pack(the_socket, timeout=0.5):
             else:
                 time.sleep(0.1)
         except:
-            pass 
+            pass
     string = b''.join(total_data)
     if string == b'':
         return ''
     return decode(string)
 
 def recv_timeout(the_socket,timeout=0.5):
-    the_socket.setblocking(0)  
+    the_socket.setblocking(1)  
     total_data=[];
-    data=''; 
+    data='';
     begin=time.time()
     while 1:
         if total_data and time.time()-begin > timeout:
@@ -45,5 +45,5 @@ def recv_timeout(the_socket,timeout=0.5):
             else:
                 time.sleep(0.1)
         except:
-            pass 
+            pass
     return ''.join(total_data)

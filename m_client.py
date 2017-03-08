@@ -46,10 +46,10 @@ class Client:
 		self.public_key, self.private_key = self.encryptor.keyGenerate(session_name)
 		db_dest, key = self.create_db_destination(0, portEnum.db.value)
 		message = encode(self.create_db_message(None, {'pir_xor': None, 'request_type': RequestType.get_db_size.value, 'pk': self.public_key}))
-		print(db_dest, message)
 		json_msg = self.encryptForDB(message, key, session_name)
-		return network_sender.send_data_wait_long_response(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
-
+		response = network_sender.send_data_wait_long_response(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
+		print(response)
+		return response
 
 	def xor(self, messages):
 		pir_executor = PIRExecutor()
