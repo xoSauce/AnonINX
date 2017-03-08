@@ -77,6 +77,7 @@ class RequestCreator():
 		return (data_string, serialized_destination)
 
 	def post_msg_to_db(self, destination, data):
+		print("TO DB:", data, type(data))
 		data_string = json.dumps(data)
 		serialized_destination = {
 			'ip': destination[0],
@@ -108,7 +109,7 @@ class RequestCreator():
 		}
 		data_string = json.dumps(public_key_in_utf8)
 		serialized_destination = {
-			'ip':destination['ip'], 
+			'ip':destination['ip'],
 			'port':int(destination['port'])
 		}
 		return (data_string, serialized_destination)
@@ -123,7 +124,7 @@ class RequestCreator():
 		}
 		data_string = json.dumps(public_key_in_utf8)
 		serialized_destination = {
-			'ip':destination['ip'], 
+			'ip':destination['ip'],
 			'port':int(destination['port'])
 		}
 		return (data_string, serialized_destination)
@@ -138,7 +139,7 @@ class RequestCreator():
 		}
 		serialized_destination = {
 			'ip': destination,
-			'port': int(enumPort.mix.value) 
+			'port': int(enumPort.mix.value)
 		}
 		data_string = json.dumps(json_dict)
 		return (data_string, serialized_destination)

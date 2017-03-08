@@ -26,11 +26,8 @@ class Worker(Thread):
 		self.start()
 
 	def run(self):
-		raw = self.sock.recv(1024).decode()
-		print("RAW", raw)
-		data = raw
-		while type(data) == 'str':
-			data = json.loads(raw)
+		raw = recv_timeout(self.sock)
+		data = json.loads(raw)
 		print("LOADED", data, type(data))
 		iv = unhexlify(data["iv"].encode())
 		text = unhexlify(data["text"].encode())
