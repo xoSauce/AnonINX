@@ -38,27 +38,23 @@ class Worker(Thread):
 		client_pk = decrypted_msg['pk'][2]
 		print("request_type", request_type)
 		if request_type == RequestType.get_db_size.value:
-			print("here")
 			record_size = self.dbnode.getRecordsSize()
-			print(record_size)
 			reply = encode(record_size)
-			print(reply)
 			self.sock.send(reply)
-			return
 		elif request_type == RequestType.push_to_db.value:
 			answer = self.dbnode.fetch_answer(decrypted_msg)
 			reply = encode(answer)
-
-		encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
-		nymtuple = decrypted_msg['nymtuple']
-		first_node = decode(nymtuple[0])
-		header, delta = package_surb(getGlobalSphinxParams(), nymtuple, encrypted_reply)
-		mix_list = self.dbnode.get_mixnode_list()
-		json_data, dest = RequestCreator().post_msg_to_mix(
-			{'ip': first_node[1], 'port': self.mixport},
-			{'header': header, 'delta': delta}
-		)
-		self.network_sender.send_data(json_data, dest)
+			print(reply)
+			encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
+			nymtuple = decrypted_msg['nymtuple']
+			first_node = decode(nymtuple[0])
+			header, delta = package_surb(getGlobalSphinxParams(), nymtuple, encrypted_reply)
+			mix_list = self.dbnode.get_mixnode_list()
+			json_data, dest = RequestCreator().post_msg_to_mix(
+				{'ip': first_node[1], 'port': self.mixport},
+				{'header': header, 'delta': delta}
+			)
+			self.network_sender.send_data(json_data, dest)
 
 class DBListener(GenericListener):
 	def __init__(self, db_port, mixport, dbnode):
