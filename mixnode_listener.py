@@ -33,10 +33,9 @@ class Worker(Thread):
 			return (ecPt, unhexlify(h_1), unhexlify(h_2))
 
 		raw_data = recv_timeout(self.sock)
-		print(raw_data)
-		data = json.loads(unhexlify(raw_data))
+		data = json.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
-			data = decode(data['payload'])
+			data = unhexlify(data['payload'])
 			header = data['header']
 			delta = data['delta']
 			result = self.mixnode.process(header, delta)
