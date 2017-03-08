@@ -15,7 +15,6 @@ def recv_timeout_petlib_pack(the_socket, timeout=0.5):
             break
         try:
             data = the_socket.recv(1024)
-            print("DATA", data)
             if data:
                 total_data.append(data)
                 begin = time.time()

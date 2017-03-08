@@ -33,8 +33,8 @@ class StatusChecker(Thread):
 
 		for entry in remove_db:
 			del broker.db_public_keys[entry]
-		print("Mixnodes", broker.mix_public_keys)
-		print("Dbs", broker.db_public_keys)
+		# print("Mixnodes", broker.mix_public_keys)
+		# print("Dbs", broker.db_public_keys)
 
 	def kill(self):
 		self.work = False
