@@ -36,7 +36,7 @@ class Worker(Thread):
 		raw_data = recv_timeout(self.sock)
 		if type(raw_data).__name__ == 'str':
 			data = json.loads(raw_data)
-		else
+		else:
 			data = pickle.loads(raw_data)
 		if data['type'] == RequestType.push_to_mix.value:
 			data = decode(data['payload'])
