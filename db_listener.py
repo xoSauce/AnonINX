@@ -36,9 +36,13 @@ class Worker(Thread):
 		decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
 		request_type = decrypted_msg['request_type']
 		client_pk = decrypted_msg['pk'][2]
+		print("request_type" request_type)
 		if request_type == RequestType.get_db_size.value:
+			print("here")
 			record_size = self.dbnode.getRecordsSize()
+			print(record_size)
 			reply = encode(record_size)
+			print(reply)
 			self.sock.send(reply)
 			return
 		elif request_type == RequestType.push_to_db.value:
