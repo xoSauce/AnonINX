@@ -19,7 +19,7 @@ class Worker(Thread):
 		from time import sleep
 		while response == '':
 			response = self.network_sender.send_data_wait_long_response(json_data, destination)
-			sleep(0.5)
+			sleep(1)
 		id = response['id']
 		response = response['response']
 		print(response)
