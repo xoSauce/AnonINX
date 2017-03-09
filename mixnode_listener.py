@@ -24,6 +24,7 @@ class service(socketserver.BaseRequestHandler):
         try:
           self.mixnode = self.server.mixnode
           self.network_sender = NetworkSender()
+          self.mix_port = self.server.mixport
           raw_data = recv_timeout(self.request)
           data = json.loads(raw_data)
           if data['type'] == RequestType.push_to_mix.value:
@@ -62,15 +63,17 @@ class service(socketserver.BaseRequestHandler):
               self.request.close()
 
 class MixNodeListener(Thread):
-  def __init__(self, port, mixnode):
+  def __init__(self, port, mixnode, mixport):
     Thread.__init__(self)
     self.port = port
     self.mixnode = mixnode
+    self.mixport = mixport
 
   def listen(self):
     ThreadedTCPServer.allow_reuse_address = True
     server = ThreadedTCPServer(('', self.port), service)
     server.mixnode = self.mixnode
+    server.mixport = self.mixport
     try:
         server.serve_forever()
     finally:

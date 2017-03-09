@@ -26,7 +26,8 @@ def main():
 
 	mixNode = MixNode(broker_config, 3)
 	response = mixNode.publish_key()
-	mixNodeListener = MixNodeListener(portEnum.mix.value, mixNode)
+	mixport = int(portEnum.mix.value)
+	mixNodeListener = MixNodeListener(portEnum.mix.value, mixNode, mixport)
 	mixNodeListener.start()
 	mixNodeSender = MixNodeSender(mixNode.mix_pool)
 	mixNodeSender.start()
