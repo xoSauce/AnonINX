@@ -1,0 +1,3 @@
+git commit -am "deploying to db automatically"
+git push
+fab mix_1_2 deploy
