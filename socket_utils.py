@@ -21,9 +21,7 @@ def recv_timeout_petlib_pack(the_socket, timeout=0.1):
                 begin = time.time()
             else:
                 isEmpty += 1
-                time.sleep(0.01)
-            if data == '':
-                print("IS EMPTY !!!")
+                time.sleep(0.02)
         except:
             pass
     string = b''.join(total_data)
@@ -48,10 +46,8 @@ def recv_timeout(the_socket,timeout=0.1):
                 total_data.append(data)
                 begin = time.time()
             else:
-                time.sleep(0.01)
+                time.sleep(0.02)
                 isEmpty += 1
-            if data == '':
-                print("IS EMPTY !!!")
         except:
             pass
     return ''.join(total_data)

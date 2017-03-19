@@ -8,7 +8,7 @@ from functools import reduce
 from numpy import median
 
 times = []
-ip = '34.249.160.113 8080'
+ip = '34.249.14.28'
 class Runner(threading.Thread):
     def __init__(self, index):
         self.index =index

@@ -30,10 +30,10 @@ class MixNode():
 
 	def print_cache(self):
 		threading.Timer(10, self.print_cache).start()
-		print ("Cache:", self.client_cache)
+		print ("Cache size:", len(self.client_cache))
 
 	def pool_item(self, item):
-		print("CONTENTS_IN_POOL ON ADD", self.mix_pool.getContents())
+		print("CONTENTS_IN_POOL ON ADD", len(self.mix_pool.getContents()))
 		self.mix_pool.addInPool(item)
 
 	def getDbList(self):

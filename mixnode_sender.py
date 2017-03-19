@@ -6,13 +6,13 @@ from epspvt_utils import Debug
 class MixNodeSender(Thread):
 	def print_pool(self):
 		threading.Timer(5, self.print_pool).start()
-		#print ("POOL CONTENTS:", self.pool.getContents(), len(self.pool.getContents()))
+		print ("POOL CONTENTS:", len(self.pool.getContents()))
 
 	def __init__(self, pool):
 		Thread.__init__(self)
 		self.network_sender = NetworkSender()
 		self.pool = pool
-		# self.print_pool()
+		self.print_pool()
 
 	def run(self):
 		while(1):

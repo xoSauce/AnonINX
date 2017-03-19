@@ -73,7 +73,7 @@ class service(socketserver.BaseRequestHandler):
                     operation = '[CLIENT_POLL] send'
                     end = time.time()
                     timestamp = datetime.fromtimestamp(
-                        end - start).strftime('%M:%S')
+                        end - start).strftime('%M:%S:%f')
                     logger.log_info(
                         '[TIME] MIX LISTENER {} TOOK {}'.format(operation, timestamp))
         finally:
