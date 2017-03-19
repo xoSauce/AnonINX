@@ -17,7 +17,7 @@ class Runner(threading.Thread):
     def run(self):
         i = self.index
         startTime = time.time()
-        response = subprocess.check_call(['python3', '/home/xosauce/UCL/Mproject/epspvt/m_client.py', ip, '8080', '-i', str(i), '-db', '0'], stdout=subprocess.DEVNULL)
+        response = subprocess.check_call(['python3', '/home/xosauce/UCL/mproject/m_client.py', ip, '8080', '-i', str(i), '-db', '0'], stdout=subprocess.DEVNULL)
         endTime = time.time() - startTime
         times.append(endTime)
         print("Finished with code {}".format(response))
