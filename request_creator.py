@@ -72,7 +72,6 @@ class RequestCreator():
 		return (data_string, serialized_destination)
 
 	def post_msg_to_db(self, destination, data):
-		print("TO DB:", data, type(data))
 		# data_string = json.dumps(data)
 		serialized_destination = {
 			'ip': destination[0],
