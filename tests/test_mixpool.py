@@ -11,3 +11,10 @@ def test_mixpool_selection():
 	selection = mixpool.getSelection()
 	assert(len(selection) == minsize)
 	assert(len(mixpool.pool) == 7)
+	selection = mixpool.getSelection()
+	assert(len(selection) == minsize)
+	assert(len(mixpool.pool) == 4)
+	selection = mixpool.getSelection()
+	assert(len(selection) == 1)
+	assert(len(mixpool.pool) == 3)
+	## one more selection would block.

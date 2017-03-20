@@ -15,7 +15,7 @@ class MixPool:
 		self.lock.acquire()
 		try:
 			selection_size = min(self.min_size, len(self.pool) - self.min_size)
-			while(len(self.pool) - selection_size < self.min_size):
+			while(len(self.pool) - selection_size < self.min_size or len(self.pool) == self.min_size):
 				time.sleep(self.SLEEP_TIME)
 
 			secure_random = random.SystemRandom()
