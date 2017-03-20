@@ -14,9 +14,7 @@ class MixPool:
 	def getSelection(self):
 		self.lock.acquire()
 		try:
-			if selection_size is None:
-				selection_size = min(self.min_size, len(self.pool) - self.min_size)
-
+			selection_size = min(self.min_size, len(self.pool) - self.min_size)
 			while(len(self.pool) - selection_size < self.min_size):
 				time.sleep(self.SLEEP_TIME)
 
