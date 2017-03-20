@@ -33,7 +33,7 @@ class MixNode():
 		print ("Cache size:", len(self.client_cache))
 
 	def pool_item(self, item):
-		print("CONTENTS_IN_POOL ON ADD", len(self.mix_pool.getContents()))
+		# print("CONTENTS_IN_POOL ON ADD", len(self.mix_pool.getContents()))
 		self.mix_pool.addInPool(item)
 
 	def getDbList(self):
@@ -106,8 +106,6 @@ class MixNode():
 		elif routing[0] == Dest_flag:
 			dest, msg = receive_forward(self.params, delta)
 			return (Dest_flag, msg, dest, None)
-			if cb is not None:
-				cb()
 		elif routing[0] == Surb_flag:
 			flag, dest, myid = routing
 			return (flag, dest, myid, delta)
