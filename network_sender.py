@@ -12,7 +12,6 @@ class NetworkSender():
 			ip = destination['ip']
 			port = destination['port']
 			s = PIRSocket()
-			print(ip, port)
 			s.connect((ip, port))
 			if type(msg).__name__ == 'str':
 				msg = msg.encode()

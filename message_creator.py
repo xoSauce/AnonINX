@@ -29,7 +29,7 @@ class MessageCreator:
 				 db_index[i] = []
 			db_index[requested_db].append(real_message)
 			current_db = 0
-			requests_per_db = SecurityParameters.NUMBER_OF_REQUESTS / self.dbnum
+			requests_per_db = int(SecurityParameters.NUMBER_OF_REQUESTS / self.dbnum)
 			for i in indexes:
 				db_index[current_db].append(self.client.package_message(i, current_db, pir_xor, portEnum))
 				if len(db_index[current_db]) >= requests_per_db:

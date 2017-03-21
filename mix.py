@@ -31,6 +31,17 @@ class MixNode():
 		self.mix_pool = MixPool(pool_size)
 		self.client_backlog = set()
 
+	def handlePool(self, pool_lock):
+		while(1):
+			with pool_lock:
+				items_to_send = self.mix_pool.getSelection()
+			for entry in items_to_send:
+				json_data, destination = entry
+				if Debug.dbg:
+					destination['ip'] = '0.0.0.0'
+				self.network_sender.send_data(json_data, destination)
+			time.sleep(0.2)
+
 	def handleCache(self, backlog_lock):
 		while 1:
 			toRemove = []
@@ -57,7 +68,6 @@ class MixNode():
 			time.sleep(0.05)
 
 	def pool_item(self, item):
-		# print("CONTENTS_IN_POOL ON ADD", len(self.mix_pool.getContents()))
 		self.mix_pool.addInPool(item)
 
 	def getDbList(self):

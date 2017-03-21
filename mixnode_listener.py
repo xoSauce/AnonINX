@@ -113,11 +113,11 @@ from network_sender import NetworkSender
 #         self.listen()
 
 class MixListenerHandler(RequestHandler):
-    def setData(self, mixnode, backlog_lock, mixport, callback_data=None):
+    def setData(self, mixnode, locks, mixport, callback_data=None):
         super().setData(callback_data)
         self.mixnode = mixnode
         self.network_sender = NetworkSender()
-        self.backlog_lock = backlog_lock
+        self.backlog_lock, self.pool_lock  = locks
         self.mixport = mixport
 
     def handle_read(self):
@@ -137,7 +137,8 @@ class MixListenerHandler(RequestHandler):
                         {'ip': addr, 'port': self.mixport},
                         {'header': header, 'delta': delta}
                     )
-                    self.mixnode.pool_item((json_data, dest))
+                    with pool_lock:
+                        self.mixnode.pool_item((json_data, dest))
                     operation = '[RELAY_FLAG] pool'
                 elif result[0] == Dest_flag:
                     flag, msg, dest, _ = result
@@ -161,14 +162,14 @@ class MixListenerHandler(RequestHandler):
 
 
 class MixNodeListener(asyncore.dispatcher):
-    def __init__(self, host, port, mixnode, backlog_lock, mixport):
+    def __init__(self, host, port, mixnode, locks, mixport):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.set_reuse_addr()
         self.bind((host, port))
         self.listen(5)
         self.mixnode = mixnode
-        self.backlog_lock = backlog_lock
+        self.locks = locks
         self.mixport = mixport
 
     def handle_accept(self):
@@ -176,4 +177,4 @@ class MixNodeListener(asyncore.dispatcher):
         if pair is not None:
             sock, addr = pair
             handler = MixListenerHandler(sock)
-            handler.setData(self.mixnode, self.backlog_lock, self.mixport)
+            handler.setData(self.mixnode, self.locks, self.mixport)
