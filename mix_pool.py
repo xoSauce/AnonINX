@@ -13,7 +13,7 @@ class MixPool:
 	def getSelection(self):
 		selection_size = min(self.min_size, len(self.pool) - self.min_size)
 		if selection_size > 0:
-			secure_random = random.SystemiRandom()
+			secure_random = random.SystemRandom()
 			secure_random.shuffle(self.pool)
 			result = self.pool[(selection_size*(-1)):]
 			self.pool = self.pool[:(selection_size*(-1))]
