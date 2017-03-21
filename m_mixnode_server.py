@@ -30,7 +30,7 @@ def main():
 	response = mixNode.publish_key()
 	mixport = int(portEnum.mix.value)
 	backlog_lock = Lock()
-	mixNodeListener = MixNodeListener('localhost', portEnum.mix.value, mixNode, backlog_lock)
+	mixNodeListener = MixNodeListener('0.0.0.0', portEnum.mix.value, mixNode, backlog_lock)
 	loop_thread = Thread(target=asyncore.loop, name="mixnode listneer")
 	loop_thread.start()
 	cache_sender = Thread(target=mixNode.handleCache, args=(backlog_lock,), name ="cache handler")

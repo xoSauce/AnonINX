@@ -52,7 +52,7 @@ def main():
 	status = StatusChecker(broker)
 	try:
 		status.start()
-		key_listener = KeyListener('localhost', portEnum.broker.value, broker)
+		key_listener = KeyListener('0.0.0.0', portEnum.broker.value, broker)
 		loop_thread = Thread(target=asyncore.loop, name="Asyncore Loop")
 		loop_thread.start()
 	except Exception as e:

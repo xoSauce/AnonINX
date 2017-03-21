@@ -12,6 +12,7 @@ class NetworkSender():
 			ip = destination['ip']
 			port = destination['port']
 			s = PIRSocket()
+			print(ip, port)
 			s.connect((ip, port))
 			if type(msg).__name__ == 'str':
 				msg = msg.encode()
@@ -20,22 +21,6 @@ class NetworkSender():
 		finally:
 			self.lock.release()
 
-	# def send_data_wait_long_response(self, msg, destination):
-	# 	self.lock.acquire()
-	# 	try:
-	# 		ip = destination['ip']
-	# 		port = destination['port']
-	# 		s = PIRSocket()
-	# 		s.connect((ip, port))
-	# 		if type(msg).__name__ == 'str':
-	# 			msg = msg.encode()
-	# 		s.sendall(msg)
-	# 		raw = recv_timeout_petlib_pack(s)
-	# 		data = raw
-	# 		s.close()
-	# 		return data
-	# 	finally:
-	# 		self.lock.release()
 
 	def send_data_wait(self, msg, destination, timeout = None):
 		self.lock.acquire()

@@ -27,7 +27,7 @@ def main():
 
 	dbNode = DbNode(broker_config)
 	response = dbNode.publish_key()
-	dbListener = DBListener('localhost', portEnum.db.value, portEnum.mix.value, dbNode)
+	dbListener = DBListener('0.0.0.0', portEnum.db.value, portEnum.mix.value, dbNode)
 	loop_thread = Thread(target=asyncore.loop, name="db loop")
 	loop_thread.start()
 
