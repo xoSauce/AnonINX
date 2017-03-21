@@ -17,7 +17,6 @@ env.repo = 'https://github.com/xoSauce/Lower-Cost-epsilon-Private-Information-Re
 env.timestamp = "release_%s" % int(time.time() * 1000)
 env.activate = "source ~/ENV/bin/activate"
 #timestamp="release_%s" % int(time.time() * 1000)
-def mix_host_extra():
 
 def all_hosts():
     env.hosts = [
