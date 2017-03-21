@@ -81,30 +81,27 @@ class DbNode():
 		return len(self.records['collection'])
 
 	def fetch_answer(self, msg):
-		db_cache = self.getRecords()['collection']
-		pir_xor = msg['pir_xor']
-		if not pir_xor:
-			index = msg['index']
-			return db_cache.get(index)
-		else:
-			pir_executor = PIRExecutor()
-			vector = msg['index']
-			message = ''
-			for i, val in enumerate(vector):
-				if val == 1:
-					if message == '':
-						value = db_cache.get(i)
-						if value:
-							message = db_cache.get(i)
+		try:
+			db_cache = self.getRecords()['collection']
+			pir_xor = msg['pir_xor']
+			if not pir_xor:
+				index = msg['index']
+				return db_cache[index]
+			else:
+				pir_executor = PIRExecutor()
+				vector = msg['index']
+				message = ''
+				print("DB_CACHE", db_cache)
+				print("VECTOR", vector, len(vector))
+				for i, val in enumerate(vector):
+					if val == 1:
+						if message == '':
+							message = db_cache[i]
 						else:
-							return None # There is no such record
-					else:
-						value = db_cache.get(i)
-						if value:
-							message = pir_executor.stringXorer(message, value)
-						else:
-							return None
-			return message
+							message = pir_executor.stringXorer(message, db_cache[i])
+				return message
+		except IndexError:
+			return b'No such index in the database.'
 
 	def publish_key(self):
 		def prepare_sending_pk(public_key, server_config):
