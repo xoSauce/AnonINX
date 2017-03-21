@@ -30,10 +30,11 @@ class MessageCreator:
 			db_index[requested_db].append(real_message)
 			current_db = 0
 			requests_per_db = int(SecurityParameters.NUMBER_OF_REQUESTS / self.dbnum)
+			print(requests_per_db, self.dbnum, len(indexes))
 			for i in indexes:
 				db_index[current_db].append(self.client.package_message(i, current_db, pir_xor, portEnum))
-				if len(db_index[current_db]) >= requests_per_db:
-					current_db += 1
+				current_db += 1
+				current_db %= self.dbnum
 			return db_index
 		else:
 			pirExecutor = PIRExecutor()
