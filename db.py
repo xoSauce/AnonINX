@@ -96,7 +96,7 @@ class DbNode():
 						value = db_cache.get(i)
 						if value:
 							message = db_cache.get(i)
-						else
+						else:
 							return None # There is no such record
 					else:
 						value = db_cache.get(i)
