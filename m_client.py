@@ -102,7 +102,7 @@ class Client:
 				log_debug(msg)
 				decrypted_msg = decode(self.decrypt(messages[surbid][1], msg['key'][1]))
 				if pir:
-					decrypted_msgs.append(decrypted_msg.encode())
+					decrypted_msgs.append(decrypted_msg)
 				else:
 					decrypted_msgs[messages[surbid][0]] = decrypted_msg
 			if pir:
@@ -110,6 +110,7 @@ class Client:
 			else:
 				return decrypted_msgs[requested_index].strip()
 		except Exception as e:
+			print(e)
 			log_debug('[ERROR] Exception\n{}\n'.format(e))
 
 

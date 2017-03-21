@@ -91,8 +91,6 @@ class DbNode():
 				pir_executor = PIRExecutor()
 				vector = msg['index']
 				message = ''
-				print("DB_CACHE", db_cache)
-				print("VECTOR", vector, len(vector))
 				for i, val in enumerate(vector):
 					if val == 1:
 						if message == '':
