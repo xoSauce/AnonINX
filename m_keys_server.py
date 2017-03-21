@@ -2,6 +2,7 @@ from broker import Broker
 from key_listener import KeyListener
 from request_creator import PortEnum
 from threading import Thread
+import asyncore
 import subprocess as sp
 import time
 import sys
@@ -51,9 +52,11 @@ def main():
 	status = StatusChecker(broker)
 	try:
 		status.start()
-		key_listener = KeyListener(portEnum.broker.value, broker)
-		key_listener.run()
-	except:
+		key_listener = KeyListener('localhost', portEnum.broker.value, broker)
+		loop_thread = Thread(target=asyncore.loop, name="Asyncore Loop")
+		loop_thread.start()
+	except Exception as e:
+		print(e)
 		status.kill()
 
 

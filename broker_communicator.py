@@ -10,10 +10,10 @@ class BrokerCommunicator:
 		request_creator = RequestCreator()
 		data_string, serialized_destination = request_creator.get_all_mixnode_request(source)
 		response = self.network_sender.send_data_wait(data_string, serialized_destination)
-		return json.loads(response)
+		return json.loads(response.decode())
 
 	def getDBList(self, source):
 		request_creator = RequestCreator()
 		data_string, serialized_destination = request_creator.get_all_db_request(source)
 		response = self.network_sender.send_data_wait(data_string, serialized_destination)
-		return json.loads(response)
+		return json.loads(response.decode())

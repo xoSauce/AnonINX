@@ -16,7 +16,7 @@ from hashlib import sha256
 # 	self.public_key = public_key
 
 class Encryptor():
-	
+
 	def __init__(self, group):
 		self.G = group
 		pass
@@ -29,9 +29,9 @@ class Encryptor():
 		return (public_key, private_key)
 
 	def encrypt_aes_gcm(self, msg, public_key, session):
-		aes = Cipher.aes_128_gcm() 
+		aes = Cipher.aes_128_gcm()
 		iv = urandom(16)
-		_, aes_private_key = self.keyGenerate(session) 
+		_, aes_private_key = self.keyGenerate(session)
 		x = aes_private_key[1]
 		g_x = aes_private_key[2]
 		e_key = hexlify(self.G.expon(public_key, x).export())
@@ -44,7 +44,6 @@ class Encryptor():
 		g_x, iv, ciphertext, tag = msg
 		d_key = hexlify(self.G.expon(g_x, secret).export())
 		d_key = sha256(d_key).digest()[:16]
-		print("DECRYPT: ", d_key, ciphertext)
 		msg = aes.quick_gcm_dec(d_key, iv, ciphertext, tag)
 		return msg
 

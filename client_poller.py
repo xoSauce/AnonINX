@@ -15,18 +15,15 @@ class Worker(Thread):
 
 	def run(self):
 		json_data, destination = self.request_creator.poll_mixnode(self.id, self.mixnode)
-		response = ''
-		from time import sleep
-		while response == '':
-			response = self.network_sender.send_data_wait_long_response(json_data, destination)
-			sleep(1)
-		id = response['id']
-		response = response['response']
-		print(response)
-		for entry in response:
-			msg = entry['delta']
-			recoveredMessage = self.client.recoverMessage(msg, entry['myid'])
-			self.message_pool[id] = (recoveredMessage[0], recoveredMessage[1])
+		response = self.network_sender.send_data_wait(json_data, destination, timeout=10)
+		if response:
+			response = decode(response)
+			id = response['id']
+			response = response['response']
+			for entry in response:
+				msg = entry['delta']
+				recoveredMessage = self.client.recoverMessage(msg, entry['myid'])
+				self.message_pool[id] = (recoveredMessage[0], recoveredMessage[1])
 
 class ClientPoller():
 	def __init__(self):

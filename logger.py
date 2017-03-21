@@ -1,5 +1,6 @@
 import logging
 import os
+
 def log_init(filename='example.log'):
 	log_dir= 'logs'
 	if not os.path.exists(log_dir):

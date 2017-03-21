@@ -1,6 +1,7 @@
 import socket
 import threading
-from socket_utils import recv_timeout_petlib_pack
+from socket_utils import recv_timeout_petlib_pack, recv_timeout
+from PirSocket import PIRSocket
 class NetworkSender():
 	def __init__(self):
 		self.lock = threading.Lock()
@@ -10,46 +11,44 @@ class NetworkSender():
 		try:
 			ip = destination['ip']
 			port = destination['port']
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			s = PIRSocket()
 			s.connect((ip, port))
 			if type(msg).__name__ == 'str':
 				msg = msg.encode()
-			s.send(msg)
+			s.sendall(msg)
 			s.close()
 		finally:
 			self.lock.release()
 
-	def send_data_wait_long_response(self, msg, destination):
-		self.lock.acquire()
-		try:
-			ip = destination['ip']
-			port = destination['port']
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.connect((ip, port))
-			if type(msg).__name__ == 'str':
-				msg = msg.encode()
-			print(msg, type(msg))
-			s.send(msg)
-			raw = recv_timeout_petlib_pack(s)
-			data = raw
-			s.close()
-			return data
-		finally:
-			self.lock.release()
+	# def send_data_wait_long_response(self, msg, destination):
+	# 	self.lock.acquire()
+	# 	try:
+	# 		ip = destination['ip']
+	# 		port = destination['port']
+	# 		s = PIRSocket()
+	# 		s.connect((ip, port))
+	# 		if type(msg).__name__ == 'str':
+	# 			msg = msg.encode()
+	# 		s.sendall(msg)
+	# 		raw = recv_timeout_petlib_pack(s)
+	# 		data = raw
+	# 		s.close()
+	# 		return data
+	# 	finally:
+	# 		self.lock.release()
 
-	def send_data_wait(self, msg, destination):
+	def send_data_wait(self, msg, destination, timeout = None):
 		self.lock.acquire()
 		try:
 			ip = destination['ip']
 			port = destination['port']
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			s = PIRSocket()
 			s.connect((ip, port))
 			if type(msg).__name__ == 'str':
 				msg = msg.encode()
-			s.send(msg)
-			raw = s.recv(1024)
-			data = raw.decode()
+			s.sendall(msg)
+			raw = recv_timeout(s, timeout=timeout)
 			s.close()
-			return data
+			return raw
 		finally:
 			self.lock.release()

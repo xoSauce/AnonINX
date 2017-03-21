@@ -3,7 +3,7 @@ import array
 class PIRExecutor():
 	def __init__(self):
 		pass
-	
+
 	def _getRandomBernouille(self, random_gen):
 		r = random()
 		if r < random_gen:
@@ -44,7 +44,7 @@ class PIRExecutor():
 			a = a.encode('utf-8')
 		if type(b) is str:
 			b = b.encode('utf-8')
-			
+
 		array_a = array.array('B', a)
 		array_b = array.array('B', b)
 		while(len(array_a) < len(array_b)):
@@ -70,7 +70,7 @@ class PIRExecutor():
 	def getMessagePack(self, index, size, dbnum):
 		## return a transposed list of messages, ready to be sent
 		return [list(i) for i in zip(*self._getMessagePack(index,size, dbnum))]
-		
+
 
 if __name__ == '__main__':
 	index = 1

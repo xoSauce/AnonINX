@@ -15,7 +15,7 @@ env.latest_dir = '/home/%s/itPIR/latest' % env.user
 env.code_dir = '/home/%s/itPIR' % env.user
 env.repo = 'https://github.com/xoSauce/Lower-Cost-epsilon-Private-Information-Retrieval.git'
 env.timestamp = "release_%s" % int(time.time() * 1000)
-env.activate = "source %s/releases/%s/%s/bin/activate" % (env.code_dir, env.timestamp, env.env_directory)
+env.activate = "source ~/ENV/bin/activate"
 #timestamp="release_%s" % int(time.time() * 1000)
 def all_hosts():
     env.hosts = [
@@ -128,13 +128,21 @@ def remove_():
     with cd("~"):
         sudo("rm -rf itPIR")
 @parallel
-def deploy():
+def deploy_scratch():
     define_permissions()
     system_dependencies_ubuntu()
     fetch_repo()
     update_permissions()
     create_venv()
     run_pip()
+    copy_latest()
+
+@parallel
+def deploy_withvenv():
+    define_permissions()
+    system_dependencies_ubuntu()
+    fetch_repo()
+    update_permissions()
     copy_latest()
 
 def deploy_db_file(path_db):
@@ -183,7 +191,7 @@ def fetch_repo():
         run("git clone %s %s" % (env.repo, env.timestamp))
 
 def create_venv():
-    with cd("%s/releases/%s" % (env.code_dir, env.timestamp)):
+    with cd("~/"):
         run("virtualenv -p python3 %s" % env.env_directory)
 
 @_contextmanager
@@ -193,9 +201,8 @@ def virtualenv():
             yield
 @_contextmanager
 def virtualenv_latest():
-    with cd(env.latest_dir):
-        with prefix("source ENV/bin/activate"):
-            yield
+    with prefix("source ~/ENV/bin/activate"):
+        yield
 
 def run_pip():
     with virtualenv():

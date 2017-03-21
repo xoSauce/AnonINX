@@ -8,7 +8,7 @@ from pir_executor import PIRExecutor
 import json
 import os
 class DbNode():
-	
+
 	def _get_mixnode_list(self):
 		def unhexlify_values(a_dict):
 			for x in a_dict.keys():
@@ -52,7 +52,7 @@ class DbNode():
 		if self.ip is None:
 			self.ip = getPublicIp()
 		return self.ip
-	
+
 	def decrypt(self, iv, text, pk, tag):
 		msg = self.encryptor.decrypt_aes_gcm((pk, iv, text, tag), self.private_key[1])
 		return msg
@@ -60,7 +60,6 @@ class DbNode():
 	def encrypt(self, msg, client_key):
 		g_x, iv, ciphertext, tag = self.encryptor.encrypt_aes_gcm(msg, client_key, os.urandom(16))
 		encrypted_reply = {'pk': g_x, 'iv': iv, 'text': ciphertext, 'tag': tag}
-		print("IV {}, TEXT {}, PK {}, TAG {}".format(iv, ciphertext, g_x, tag))
 		return encrypted_reply
 
 	def xor_records(self, mlist):
@@ -80,7 +79,7 @@ class DbNode():
 
 	def getRecordsSize(self):
 		return len(self.records['collection'])
-	
+
 	def fetch_answer(self, msg):
 		db_cache = self.getRecords()['collection']
 		pir_xor = msg['pir_xor']
@@ -124,5 +123,5 @@ class DbNode():
 		self.public_key, self.private_key = self.encryptor.keyGenerate(self.getIp())
 		json_data, destination = prepare_sending_pk(self.public_key, self.broker_config)
 		#publish key
-		response = self.network_sender.send_data_wait(json_data, destination)
+		response = self.network_sender.send_data(json_data, destination)
 		return response

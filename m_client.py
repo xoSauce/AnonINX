@@ -47,8 +47,9 @@ class Client:
 		db_dest, key = self.create_db_destination(0, portEnum.db.value)
 		message = encode(self.create_db_message(None, {'pir_xor': None, 'request_type': RequestType.get_db_size.value, 'pk': self.public_key}))
 		json_msg = self.encryptForDB(message, key, session_name)
-		response = network_sender.send_data_wait_long_response(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
-		return response
+		response = network_sender.send_data_wait(json_msg, {'ip':db_dest[0], 'port':db_dest[2]})
+		return int.from_bytes(response, 'big')
+
 
 	def xor(self, messages):
 		pir_executor = PIRExecutor()
@@ -58,7 +59,6 @@ class Client:
 		return message.decode().strip()
 
 	def decrypt(self, cipher, private_key):
-		print(cipher)
 		iv = cipher['iv']
 		text = cipher['text']
 		pk = cipher['pk']
@@ -96,18 +96,22 @@ class Client:
 		decrypted_msgs = []
 		if not pir:
 			decrypted_msgs = {}
-
-		for surbid, _ in self.surbDict.items():
-			msg = self.surbDict[surbid]
-			decrypted_msg = decode(self.decrypt(messages[surbid][1], msg['key'][1]))
+		try:
+			for surbid, _ in self.surbDict.items():
+				msg = self.surbDict[surbid]
+				log_debug(msg)
+				decrypted_msg = decode(self.decrypt(messages[surbid][1], msg['key'][1]))
+				if pir:
+					decrypted_msgs.append(decrypted_msg.encode())
+				else:
+					decrypted_msgs[messages[surbid][0]] = decrypted_msg
 			if pir:
-				decrypted_msgs.append(decrypted_msg.encode())
+				return self.xor(decrypted_msgs)
 			else:
-				decrypted_msgs[messages[surbid][0]] = decrypted_msg
-		if pir:
-			return self.xor(decrypted_msgs)
-		else:
-			return decrypted_msgs[requested_index].strip()
+				return decrypted_msgs[requested_index].strip()
+		except Exception as e:
+			log_debug('[ERROR] Exception\n{}\n'.format(e))
+
 
 	def recoverMessage(self, msg, myid):
 		surbkeytuple = self.surbDict[myid]['surbkeytuple']
@@ -224,7 +228,6 @@ class Client:
 			{'ip': first_mix, 'port': portEnum.mix.value},
 			{'header': header, 'delta': delta}
 		)
-		print(json_data, dest)
 		if Debug.dbg is True:
 			dest['ip'] = b'0.0.0.0'
 		return (json_data, dest)

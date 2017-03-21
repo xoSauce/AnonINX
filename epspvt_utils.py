@@ -1,8 +1,14 @@
 import requests
-from sphinxmix.SphinxParams import SphinxParams	
+from sphinxmix.SphinxParams import SphinxParams
 
 class Debug():
 	dbg = False
+
+class ProtocolNumber():
+	PROTOCOL_BYTE_NUMBER = 15
+
+class SecurityParameters():
+	NUMBER_OF_REQUESTS = 5 # p in the paper
 
 def getGlobalSphinxParams():
 	return SphinxParams()
@@ -11,7 +17,7 @@ def getPublicIp():
 
 	if Debug.dbg:
 		return '0.0.0.0'
-	
+
 	_RESPONSE_RETURNED = 200
 	link = "http://api.ipify.org?format=json"
 	resp = requests.get(link)

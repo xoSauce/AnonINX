@@ -5,6 +5,8 @@ from mixnode_sender import MixNodeSender
 from logger import *
 from request_creator import PortEnum, PortEnumDebug
 import argparse
+import asyncore
+from threading import Thread, Lock
 
 def parse():
 	parser = argparse.ArgumentParser()
@@ -24,11 +26,15 @@ def main():
 		Debug.dbg = True
 		portEnum = PortEnumDebug
 
-	mixNode = MixNode(broker_config, 3)
+	mixNode = MixNode(broker_config, pool_size = 3)
 	response = mixNode.publish_key()
 	mixport = int(portEnum.mix.value)
-	mixNodeListener = MixNodeListener(portEnum.mix.value, mixNode, mixport)
-	mixNodeListener.start()
+	backlog_lock = Lock()
+	mixNodeListener = MixNodeListener('localhost', portEnum.mix.value, mixNode, backlog_lock)
+	loop_thread = Thread(target=asyncore.loop, name="mixnode listneer")
+	loop_thread.start()
+	cache_sender = Thread(target=mixNode.handleCache, args=(backlog_lock,), name ="cache handler")
+	cache_sender.start()
 	mixNodeSender = MixNodeSender(mixNode.mix_pool)
 	mixNodeSender.start()
 

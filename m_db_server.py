@@ -3,6 +3,8 @@ from epspvt_utils import Debug
 from db_listener import DBListener
 from logger import *
 from request_creator import PortEnum, PortEnumDebug
+from threading import Thread
+import asyncore
 import argparse
 
 def parse():
@@ -25,8 +27,9 @@ def main():
 
 	dbNode = DbNode(broker_config)
 	response = dbNode.publish_key()
-	dbListener = DBListener(portEnum.db.value, portEnum.mix.value, dbNode)
-	dbListener.run()
+	dbListener = DBListener('localhost', portEnum.db.value, portEnum.mix.value, dbNode)
+	loop_thread = Thread(target=asyncore.loop, name="db loop")
+	loop_thread.start()
 
 if __name__ == '__main__':
 	main()
