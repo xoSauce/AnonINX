@@ -1,7 +1,6 @@
 from mix import MixNode
 from epspvt_utils import Debug, SecurityParameters
 from mixnode_listener import MixNodeListener
-from mixnode_sender import MixNodeSender
 from logger import *
 from request_creator import PortEnum, PortEnumDebug
 import argparse
