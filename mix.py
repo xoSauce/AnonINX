@@ -41,7 +41,7 @@ class MixNode():
 				if Debug.dbg:
 					destination['ip'] = '0.0.0.0'
 				self.network_sender.send_data(json_data, destination)
-			time.sleep(0.2)
+			time.sleep(0.05)
 
 	def handleCache(self, backlog_lock):
 		while 1:
