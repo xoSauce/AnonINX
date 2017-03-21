@@ -5,7 +5,7 @@ import time
 from sphinxmix.SphinxParams import SphinxParams
 from sphinxmix.SphinxNode import sphinx_process
 from sphinxmix.SphinxClient import PFdecode, Relay_flag, Dest_flag, Surb_flag, receive_forward
-from epspvt_utils import getPublicIp, getGlobalSphinxParams
+from epspvt_utils import getPublicIp, getGlobalSphinxParams, Debug
 from network_sender import NetworkSender
 from request_creator import RequestCreator
 from encryptor import Encryptor
