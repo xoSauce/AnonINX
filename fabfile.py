@@ -24,7 +24,7 @@ def all_hosts():
         # 'key-brokerU'
         # , 'mix-node1U'
         # , 'mix-node2U'
-        , 'mix-node3U'
+        'mix-node3U'
         , 'mix-node4U'
         , 'mix-node5U'
         # , 'db1'
@@ -32,6 +32,7 @@ def all_hosts():
         # , 'db3'
         # , 'db4'
     ]
+
 def debug_hosts():
 	env.hosts = [
      	'key-brokerU'
