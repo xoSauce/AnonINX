@@ -23,8 +23,11 @@ class PIRSocket(object):
         return self.sendall(msg)
 
     def sendall(self, msg):
-        msg = self._construct_message(msg)
-        return self._sock.sendall(msg)
+        msg = self._construct_message(msg)#
+        try:
+            self._sock.sendall(msg)
+        except OSError:
+            print('Client has left')
 
     def connect(self, *p):
         self._sock.connect(*p)

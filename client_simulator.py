@@ -40,8 +40,8 @@ def print_statistics(avg, maximum, minimum, median):
 
 if __name__ == '__main__':
     print("REMEMBER TO SET NEW IP OF BROKER !! Current IP {}".format(ip))
-    limit = 30
-    clients = 100
+    limit = 50
+    clients = 1000
     threadAlive = set()
     threadInactive = set()
 
