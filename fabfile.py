@@ -17,18 +17,20 @@ env.repo = 'https://github.com/xoSauce/Lower-Cost-epsilon-Private-Information-Re
 env.timestamp = "release_%s" % int(time.time() * 1000)
 env.activate = "source ~/ENV/bin/activate"
 #timestamp="release_%s" % int(time.time() * 1000)
+def mix_host_extra():
+
 def all_hosts():
     env.hosts = [
-        'key-brokerU'
-        , 'mix-node1U'
-        , 'mix-node2U'
+        # 'key-brokerU'
+        # , 'mix-node1U'
+        # , 'mix-node2U'
         , 'mix-node3U'
         , 'mix-node4U'
         , 'mix-node5U'
-        , 'db1'
-        , 'db2'
-        , 'db3'
-        , 'db4'
+        # , 'db1'
+        # , 'db2'
+        # , 'db3'
+        # , 'db4'
     ]
 def debug_hosts():
 	env.hosts = [

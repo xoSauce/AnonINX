@@ -61,7 +61,6 @@ class KeyListenerHandler(RequestHandler):
 		data = super().handle_read()
 		if data:
 			data = json.loads(data.decode())
-			print(data)
 			if data['type'] == RequestType.publish_mix_data.value:
 				self.broker.register(data['payload'], 'mix')
 				print('MixNodes:')
