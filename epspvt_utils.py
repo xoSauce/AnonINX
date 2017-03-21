@@ -12,7 +12,7 @@ class SecurityParameters():
 	REQUESTS_IN_THE_POOL = 3
 
 def getGlobalSphinxParams():
-	return SphinxParams(body_len=2048)
+	return SphinxParams(header_len = 500, body_len=2048)
 
 def getPublicIp():
 
