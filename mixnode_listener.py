@@ -137,7 +137,7 @@ class MixListenerHandler(RequestHandler):
                         {'ip': addr, 'port': self.mixport},
                         {'header': header, 'delta': delta}
                     )
-                    with pool_lock:
+                    with self.pool_lock:
                         self.mixnode.pool_item((json_data, dest))
                     operation = '[RELAY_FLAG] pool'
                 elif result[0] == Dest_flag:
