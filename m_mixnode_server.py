@@ -21,6 +21,7 @@ def main():
 	log_init("m_mixnode_server.log")
 	broker_config = vars(parse())
 
+	Debug.dbg = False
 	portEnum = PortEnum
 	if broker_config['debug']:
 		Debug.dbg = True
