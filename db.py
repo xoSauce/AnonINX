@@ -82,6 +82,7 @@ class DbNode():
 
 	def fetch_answer(self, msg):
 		db_cache = self.getRecords()['collection']
+		print(db_cache)
 		pir_xor = msg['pir_xor']
 		if not pir_xor:
 			index = msg['index']
