@@ -9,6 +9,7 @@ class ProtocolNumber():
 
 class SecurityParameters():
 	NUMBER_OF_REQUESTS = 5 # p in the paper
+	REQUESTS_IN_THE_POOL = 3
 
 def getGlobalSphinxParams():
 	return SphinxParams()

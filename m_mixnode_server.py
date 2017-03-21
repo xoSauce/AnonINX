@@ -1,5 +1,5 @@
 from mix import MixNode
-from epspvt_utils import Debug
+from epspvt_utils import Debug, SecurityParameters
 from mixnode_listener import MixNodeListener
 from mixnode_sender import MixNodeSender
 from logger import *
@@ -26,11 +26,11 @@ def main():
 		Debug.dbg = True
 		portEnum = PortEnumDebug
 
-	mixNode = MixNode(broker_config, pool_size = 3)
+	mixNode = MixNode(broker_config, SecurityParameters.REQUESTS_IN_THE_POOL)
 	response = mixNode.publish_key()
 	mixport = int(portEnum.mix.value)
 	backlog_lock = Lock()
-	mixNodeListener = MixNodeListener('0.0.0.0', portEnum.mix.value, mixNode, backlog_lock)
+	mixNodeListener = MixNodeListener('0.0.0.0', portEnum.mix.value, mixNode, backlog_lock, mixport)
 	loop_thread = Thread(target=asyncore.loop, name="mixnode listneer")
 	loop_thread.start()
 	cache_sender = Thread(target=mixNode.handleCache, args=(backlog_lock,), name ="cache handler")
