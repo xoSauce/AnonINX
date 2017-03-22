@@ -55,7 +55,7 @@ if __name__ == '__main__':
             threadAlive.add(t)
         check_aliveness(threadAlive)
         print("THREADS LEFT: {}".format(len(threadInactive)))
-        time.sleep(0.3)
+        time.sleep(0.05)
 
     while len(times) == 0: time.sleep(0.1)
 

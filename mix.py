@@ -34,7 +34,7 @@ class MixNode():
 	def handlePool(self, pool_lock):
 		while(1):
 			with pool_lock:
-				print("POOL SIZE: {}".format(len(self.mix_pool.getContents())))
+				# print("POOL SIZE: {}".format(len(self.mix_pool.getContents())))
 				items_to_send = self.mix_pool.getSelection()
 			for entry in items_to_send:
 				json_data, destination = entry
@@ -47,7 +47,7 @@ class MixNode():
 		while 1:
 			toRemove = []
 			with backlog_lock:
-				print('Cache size: {}'.format(len(self.client_cache)))
+				# print('Cache size: {}'.format(len(self.client_cache)))
 				for entry in self.client_backlog:
 					client_id, socket = entry
 					if client_id in self.client_cache:

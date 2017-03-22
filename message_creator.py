@@ -30,7 +30,6 @@ class MessageCreator:
 			db_index[requested_db].append(real_message)
 			current_db = 0
 			requests_per_db = int(SecurityParameters.NUMBER_OF_REQUESTS / self.dbnum)
-			print(requests_per_db, self.dbnum, len(indexes))
 			for i in indexes:
 				db_index[current_db].append(self.client.package_message(i, current_db, pir_xor, portEnum))
 				current_db += 1
