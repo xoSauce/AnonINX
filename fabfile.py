@@ -4,7 +4,6 @@ from fabric.api import *
 from fabric.contrib.console import confirm
 from fabric.operations import put
 from fabric.contrib.files import exists
-import os
 import time
 import re
 
@@ -33,31 +32,31 @@ def all_hosts():
     ]
 
 def debug_hosts():
-	env.hosts = [
-     	'key-brokerU'
-        , 'mix-node1U'
-        , 'mix-node2U'
-        , 'db1'
-        , 'db2'
-	]
+    env.hosts = [
+    'key-brokerU'
+    , 'mix-node1U'
+    , 'mix-node2U'
+    , 'db1'
+    , 'db2'
+    ]
 
 def all_dbs():
-	env.hosts = [
-		'db1',
-		'db2',
-		'db3',
-		'db4',
-	]
+    env.hosts = [
+            'db1',
+            'db2',
+            'db3',
+            'db4',
+    ]
 
 def db_1_2():
     env.hosts = [
-		'db1',
+                'db1',
         'db2'
-	]
+        ]
 def db_1():
-	env.hosts = [
-		'db1'
-	]
+    env.hosts = [
+            'db1'
+    ]
 
 def db_2():
     env.hosts = [
@@ -153,8 +152,8 @@ def deploy_withvenv():
     copy_latest()
 
 def deploy_db_file(path_db):
-	run("mkdir -p %s" % "dbs")
-	put(path_db, "dbs/")
+    run("mkdir -p %s" % "dbs")
+    put(path_db, "dbs/")
 
 def kill_python():
     sudo("pkill python");

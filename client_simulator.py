@@ -1,9 +1,7 @@
-from timeit import timeit
 import threading
 import time
 import subprocess
 import random
-from multiprocessing.pool import ThreadPool
 from functools import reduce
 from numpy import median
 

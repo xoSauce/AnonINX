@@ -1,5 +1,4 @@
 import socket
-import time
 class PIRSocket(object):
     def __init__(self, sock = None):
         if sock:
