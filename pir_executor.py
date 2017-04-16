@@ -1,4 +1,5 @@
 from random import random, uniform
+from epspvt_utils import SecurityParameters
 import array
 class PIRExecutor():
     def __init__(self):
@@ -10,9 +11,13 @@ class PIRExecutor():
             return 1
         return 0
 
-    def _genRandomVector(self, size, sumEven, random_gen = 0.4):
+    ### Generate a vector with sumEven. First generate a vector of length `size`
+    ### And then if it doesn't match the requirements, reduce the SPARSITY_FACTOR
+    ### by randomly removing one element to turn the sum from even to odd
+    def _genRandomVector(self, size, sumEven):
         vector_sum = 0
         v = []
+        random_gen = SecurityParameters.SPARSITY_FACTOR
         while vector_sum == 0:
             vector_sum = 0
             set_indexes = []
@@ -44,7 +49,6 @@ class PIRExecutor():
             a = a.encode('utf-8')
         if type(b) is str:
             b = b.encode('utf-8')
-
         array_a = array.array('B', a)
         array_b = array.array('B', b)
         while(len(array_a) < len(array_b)):
@@ -60,10 +64,7 @@ class PIRExecutor():
     def _getMessagePack(self, index, size, dbnum):
         m = []
         for i in range(size):
-            if i == index:
-                v = self._genRandomVector(dbnum, False)
-            else:
-                v = self._genRandomVector(dbnum, True)
+            v = self._genRandomVector(dbnum, not i == index)
             m.append(v)
         return m
 

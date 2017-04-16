@@ -1,6 +1,5 @@
 import threading
 from socket_utils import recv_timeout
-from socket_utils import recv_timeout_petlib_pack
 from PirSocket import PIRSocket
 class NetworkSender():
     def __init__(self):

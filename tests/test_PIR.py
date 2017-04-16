@@ -40,7 +40,7 @@ def test_PIR_xorer_list():
 		5: 'Real',
 		6: 'Real'
 	}
-	
+
 	for i in range(0,100):
 		pir_executor = PIRExecutor()
 		message = messages[0]
@@ -79,6 +79,12 @@ def test_PIR_protocol():
 		size = len(messages)
 		pir_executor = PIRExecutor()
 		m = pir_executor.getMessagePack(index, size, 5)
+		print('')
+		for i in m:
+			for j in i:
+				print(j, end='')
+			print('')
+		print('')
 		db_returns = []
 		for row in m:
 			message = ''

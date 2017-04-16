@@ -164,6 +164,7 @@ class Client:
 
     def create_db_destination(self, destination, port):
         try:
+
             destination = self.db_list[destination]
             destination = (destination[0], destination[1], port)
             key = EcPt.from_binary(
@@ -171,7 +172,7 @@ class Client:
             return (destination, key)
         except Exception as e:
             raise Exception(
-                'Requested database not present or named incorrectly. {} not found'.format(destination))
+                'Requested database not present or named incorrectly. {} not found. Error {}'.format(destination, e))
 
     def package_message(self, index, db, pir_xor, portEnum, request_type=RequestType.push_to_db.value, mix_subset=5, session_name=None):
 
@@ -277,12 +278,11 @@ def main():
     messageCreator = MessageCreator(client)
     network_sender = NetworkSender()
     record_size = client.getDBRecordSize(portEnum, network_sender)
+    pir_xor = False
     if args['xor']:
-        messages = messageCreator.generate_messages(
+        pir_xor = True
+    messages = messageCreator.generate_messages(
             requested_index, requested_db, record_size, portEnum, pir_xor=True)
-    else:
-        messages = messageCreator.generate_messages(
-            requested_index, requested_db, record_size, portEnum, pir_xor=False)
     for db in messages:
         [network_sender.send_data(json, dest) for json, dest in messages[db]]
     print("POLL_INDEX RESULT:", client.poll_index(

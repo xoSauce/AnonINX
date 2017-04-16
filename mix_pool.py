@@ -8,6 +8,8 @@ class MixPool:
     def getContents(self):
         return self.pool
 
+    ### Selecting packets out of the pool such that the property of holding
+    ### at least min_size packets is mantained.
     def getSelection(self):
         selection_size = min(self.min_size, len(self.pool) - self.min_size)
         if selection_size > 0:
