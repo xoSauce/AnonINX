@@ -41,7 +41,7 @@ class StatusChecker(Thread):
     def run(self):
         self.work = True
         while self.work:
-            self.delete_unresponse_mixes()
+            # self.delete_unresponse_mixes()
             time.sleep(5)
 
 def main():

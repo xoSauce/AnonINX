@@ -278,11 +278,13 @@ def main():
     messageCreator = MessageCreator(client)
     network_sender = NetworkSender()
     record_size = client.getDBRecordSize(portEnum, network_sender)
+    print("here")
     pir_xor = False
     if args['xor']:
         pir_xor = True
     messages = messageCreator.generate_messages(
             requested_index, requested_db, record_size, portEnum, pir_xor=True)
+    print(messages, len(messages))
     for db in messages:
         [network_sender.send_data(json, dest) for json, dest in messages[db]]
     print("POLL_INDEX RESULT:", client.poll_index(
