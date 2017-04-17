@@ -125,7 +125,7 @@ class DbListenerHandler(RequestHandler):
                 )
                 t2 = time.perf_counter()
                 elapsed_time = (t2-t1)
-                logger("TIME ELAPSED: {}".format(elapsed_time))
+                log_info("TIME ELAPSED: {}".format(elapsed_time))
                 self.network_sender.send_data(json_data, dest)
 
 
