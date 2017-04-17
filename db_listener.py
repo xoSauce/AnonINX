@@ -7,7 +7,6 @@
 # from petlib.ec import EcPt
 # from binascii import unhexlify
 # from epspvt_utils import getGlobalSphinxParams
-# from logger import *
 # from socket_utils import recv_timeout
 # from network_sender import NetworkSender
 # from sphinxmix.SphinxClient import Relay_flag
@@ -84,6 +83,8 @@ from sphinxmix.SphinxClient import rand_subset
 import socket
 import asyncore
 import json
+import time
+from logger import log_info
 
 class DbListenerHandler(RequestHandler):
     def setData(self, dbnode, mixport, callback_data=None):
@@ -109,6 +110,7 @@ class DbListenerHandler(RequestHandler):
                 reply = encode(record_size)
                 self.socket.sendall(reply)
             elif request_type == RequestType.push_to_db.value:
+                t1 = time.perf_counter()
                 answer = self.dbnode.fetch_answer(decrypted_msg)
                 reply = encode(answer)
                 encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
@@ -121,6 +123,9 @@ class DbListenerHandler(RequestHandler):
                         {'ip': first_node[1], 'port': self.mixport},
                         {'header': header, 'delta': delta}
                 )
+                t2 = time.perf_counter()
+                elapsed_time = (t2-t1)
+                logger("TIME ELAPSED: {}".format(elapsed_time))
                 self.network_sender.send_data(json_data, dest)
 
 

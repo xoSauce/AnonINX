@@ -17,7 +17,7 @@ def parse():
     return args
 
 def main():
-    log_init("m_mixnode_server.log")
+    log_init("m_db_server.log")
     broker_config = vars(parse())
 
     portEnum = PortEnum
