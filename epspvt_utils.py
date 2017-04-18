@@ -1,4 +1,6 @@
 import requests
+import sys
+import linecache
 from sphinxmix.SphinxParams import SphinxParams
 
 class Debug():
@@ -11,12 +13,24 @@ class SecurityParameters():
     NUMBER_OF_REQUESTS = 6 # p in the paper
     REQUESTS_IN_THE_POOL = 3
     SPARSITY_FACTOR = 0.4
+    NUMBER_OF_MIXES = 5 ##selection of number of mixes
     # theta sparsity factor
     # corrupt databases
     #
 
 def getGlobalSphinxParams():
     return SphinxParams(header_len = 500, body_len=2048)
+
+def PrintException():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print ('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+
+
 
 def getPublicIp():
 

@@ -6,7 +6,7 @@ from sphinxmix.SphinxClient import Nenc
 from sphinxmix.SphinxClient import rand_subset, create_forward_message, create_surb, receive_surb
 from request_creator import RequestCreator, RequestType, PortEnum, PortEnumDebug
 from network_sender import NetworkSender
-from epspvt_utils import getGlobalSphinxParams, Debug, getPublicIp
+from epspvt_utils import getGlobalSphinxParams, Debug, getPublicIp, SecurityParameters, PrintException
 from petlib.ec import EcPt
 from logger import log_init, log_debug
 from broker_communicator import BrokerCommunicator
@@ -107,13 +107,14 @@ class Client:
                 if pir:
                     decrypted_msgs.append(decrypted_msg)
                 else:
+                    print(decrypted_msg)
                     decrypted_msgs[messages[surbid][0]] = decrypted_msg
             if pir:
                 return self.xor(decrypted_msgs)
             else:
                 return decrypted_msgs[requested_index].strip()
         except Exception as e:
-            print(e)
+            PrintException()
             log_debug('[ERROR] Exception\n{}\n'.format(e))
 
     def recoverMessage(self, msg, myid):
@@ -186,8 +187,8 @@ class Client:
         def prepare_forward_message(mixnodes_dict, message, dest, key, portEnum):
             params = getGlobalSphinxParams()
             group = params.group.G
-            use_nodes_forward = rand_subset(mixnodes_dict.keys(), 5)
-            use_nodes_backward = rand_subset(mixnodes_dict.keys(), 5)
+            use_nodes_forward = rand_subset(mixnodes_dict.keys(), SecurityParameters.NUMBER_OF_MIXES)
+            use_nodes_backward = rand_subset(mixnodes_dict.keys(), SecurityParameters.NUMBER_OF_MIXES)
             nodes_routing_forward = list(map(Nenc, use_nodes_forward))
             nodes_routing_backward = list(map(Nenc, use_nodes_backward))
             pks_chosen_nodes_forward = [
@@ -278,17 +279,16 @@ def main():
     messageCreator = MessageCreator(client)
     network_sender = NetworkSender()
     record_size = client.getDBRecordSize(portEnum, network_sender)
-    print("here")
+
     pir_xor = False
     if args['xor']:
         pir_xor = True
     messages = messageCreator.generate_messages(
-            requested_index, requested_db, record_size, portEnum, pir_xor=True)
-    print(messages, len(messages))
+            requested_index, requested_db, record_size, portEnum, pir_xor)
     for db in messages:
         [network_sender.send_data(json, dest) for json, dest in messages[db]]
     print("POLL_INDEX RESULT:", client.poll_index(
-        args['xor'], requested_index), "REQUESTED_INDEX", requested_index)
+        pir_xor, requested_index), "REQUESTED_INDEX", requested_index)
 
 
 if __name__ == '__main__':
