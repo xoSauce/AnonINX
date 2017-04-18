@@ -30,19 +30,14 @@ class PIRExecutor():
             vector_sum = sum(v)
 
         if sumEven:
-            if vector_sum % 2 == 0:
-                return v
             if vector_sum % 2 != 0:
                 index = int(uniform(0, len(set_indexes)))
                 v[set_indexes[index]] = 0
-                return v
         elif not sumEven:
-            if vector_sum % 2 != 0:
-                return v
             if vector_sum % 2 == 0:
                 index = int(uniform(0, len(set_indexes)))
                 v[set_indexes[index]] = 0
-                return v
+        return v
 
     def stringXorer(self, a, b):
         if type(a) is str:

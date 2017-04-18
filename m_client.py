@@ -48,7 +48,8 @@ class Client:
         json_msg = self.encryptForDB(message, key, session_name)
         response = network_sender.send_data_wait(
             json_msg, {'ip': db_dest[0], 'port': db_dest[2]})
-        return int.from_bytes(response, 'big')
+        response = int(decode(response))
+        return response
 
     def xor(self, messages):
         pir_executor = PIRExecutor()
