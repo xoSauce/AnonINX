@@ -90,6 +90,7 @@ class DbNode():
             else:
                 pir_executor = PIRExecutor()
                 vector = msg['index']
+                print(vector)
                 message = ''
                 for i, val in enumerate(vector):
                     if val == 1:

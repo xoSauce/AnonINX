@@ -39,7 +39,7 @@ def print_statistics(avg, maximum, minimum, median):
 if __name__ == '__main__':
     print("REMEMBER TO SET NEW IP OF BROKER !! Current IP {}".format(ip))
     limit = 50
-    clients = 100
+    clients = 500
     threadAlive = set()
     threadInactive = set()
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
             threadAlive.add(t)
         check_aliveness(threadAlive)
         print("THREADS LEFT: {}".format(len(threadInactive)))
-        time.sleep(0.05)
+        time.sleep(0.3)
 
     while len(times) == 0: time.sleep(0.1)
 

@@ -107,7 +107,6 @@ class Client:
                 if pir:
                     decrypted_msgs.append(decrypted_msg)
                 else:
-                    print(decrypted_msg)
                     decrypted_msgs[messages[surbid][0]] = decrypted_msg
             if pir:
                 return self.xor(decrypted_msgs)
