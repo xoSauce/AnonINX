@@ -78,7 +78,9 @@ class DbNode():
         return self.records
 
     def getRecordsSize(self):
-        return len(self.records['collection'])
+        length = len(self.records['collection'])
+        print(length)
+        return length
 
     def fetch_answer(self, msg):
         try:

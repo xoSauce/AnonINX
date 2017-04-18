@@ -278,7 +278,7 @@ def main():
     messageCreator = MessageCreator(client)
     network_sender = NetworkSender()
     record_size = client.getDBRecordSize(portEnum, network_sender)
-
+    print(record_size)
     pir_xor = False
     if args['xor']:
         pir_xor = True
