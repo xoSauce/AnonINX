@@ -111,6 +111,7 @@ class DbListenerHandler(RequestHandler):
                 self.socket.sendall(reply)
             elif request_type == RequestType.push_to_db.value:
                 t1 = time.perf_counter()
+                print("TRYING TO FETCH")
                 answer = self.dbnode.fetch_answer(decrypted_msg)
                 print("ANSWER:", answer)
                 reply = encode(answer)
