@@ -11,7 +11,7 @@ class RequestHandler(asyncore.dispatcher_with_send):
     def handle_read(self):
         self.socket = PIRSocket(self.socket)
         local_total = []
-        data = self.recv(8192)
+        data = self.recv(8192*100)
         if data:
             number, msg = (data[:ProtocolNumber.PROTOCOL_BYTE_NUMBER],
                            data[ProtocolNumber.PROTOCOL_BYTE_NUMBER:])
@@ -19,7 +19,7 @@ class RequestHandler(asyncore.dispatcher_with_send):
             number -= len(msg)
             local_total.append(msg)
             while number > 0:
-                data = self.recv(8192)
+                data = self.recv(8192*100)
                 if data:
                     local_total.append(data)
                     number -= len(data)
