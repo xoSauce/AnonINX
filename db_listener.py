@@ -112,6 +112,7 @@ class DbListenerHandler(RequestHandler):
             elif request_type == RequestType.push_to_db.value:
                 t1 = time.perf_counter()
                 answer = self.dbnode.fetch_answer(decrypted_msg)
+                print("ANSWER:", answer)
                 reply = encode(answer)
                 encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
                 nymtuple = decrypted_msg['nymtuple']
