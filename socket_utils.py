@@ -34,7 +34,7 @@ def recv_timeout(the_socket, timeout=None):
     local_total = []
     if timeout:
         the_socket.settimeout(timeout)
-    data = the_socket.recv(8192)
+    data = the_socket.recv(8192*10)
     if data:
         number, msg = (data[:ProtocolNumber.PROTOCOL_BYTE_NUMBER],
                        data[ProtocolNumber.PROTOCOL_BYTE_NUMBER:])
@@ -42,7 +42,7 @@ def recv_timeout(the_socket, timeout=None):
         number -= len(msg)
         local_total.append(msg)
         while number > 0:
-            data = the_socket.recv(8192)
+            data = the_socket.recv(8192*10)
             if data:
                 local_total.append(data)
                 number -= len(data)
