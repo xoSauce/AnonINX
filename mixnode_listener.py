@@ -148,6 +148,7 @@ class MixListenerHandler(RequestHandler):
                 elif result[0] == Surb_flag:
                     flag, dest, myid, delta = result
                     msg = {'myid': myid, 'delta': delta}
+                    print("CACHING")
                     self.mixnode.client_cache.setdefault(myid, []).append(msg)
                     operation = '[SURB_FLAG] cache'
                 end = time.time()

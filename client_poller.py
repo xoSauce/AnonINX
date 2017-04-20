@@ -15,7 +15,7 @@ class Worker(Thread):
 
     def run(self):
         json_data, destination = self.request_creator.poll_mixnode(self.id, self.mixnode)
-        response = self.network_sender.send_data_wait(json_data, destination, timeout=120)
+        response = self.network_sender.send_data_wait(json_data, destination)
         if response:
             response = decode(response)
             id = response['id']
