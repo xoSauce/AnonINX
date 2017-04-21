@@ -75,16 +75,27 @@ def test_PIR_protocol():
 		4: 'Fake4',
 		5: 'Fake5'
 	}
+	messages = {
+		0: "Annaaa",
+		1: "George",
+		2: "Danaaa",
+		3: "Johnaa",
+		4: "Doeaaa",
+		5: "Earlaa",
+		6: "Jensaa",
+		7: "Glensa",
+	}
 	decoder = BinaryEncoderDecoder()
 	for index in range(0, len(messages)):
+		print("INDEX", index)
 		size = len(messages)
+		print(size)
 		pir_executor = PIRExecutor()
 		m = pir_executor.getMessagePack(index, size, 5)
-
 		db_returns = []
 		for row in m:
 			row = decoder.decode_binary(row, len(messages))
-			print(row)
+			print("ROW", row)
 			message = ''
 			for i in range(0, len(row)):
 				if row[i] == 1:

@@ -1,8 +1,8 @@
 from petlib.pack import encode, decode
 
 class BinaryEncoderDecoder:
-    def __init__(self, encoder_size = 64):
-        self.size = encoder_size
+    def __init__(self):
+        self.size = 64
         pass
     def encode_binary(self, l):
         string_conversion = "".join([str(x) for x in l])
@@ -19,12 +19,16 @@ class BinaryEncoderDecoder:
     def decode_binary(self, e, record_size):
         e = decode(e)
         result = ""
-        for x in e:
+        for x in e[:-1]:
             petlib_decode = decode(x)
             binary = "{0:b}".format(petlib_decode)
-            pad = "0" * (min(record_size, self.size) - len(binary))
-            print(len(pad))
+            print("BINARY", binary)
+            pad = "0" * (min(self.size, record_size) - len(binary))
             result += pad + binary
+        petlib_decode = decode(e[-1])
+        binary = "{0:b}".format(petlib_decode)
+        pad = "0" * (record_size - (len(result)+len(binary)))
+        result += pad + binary
         l = []
         for x in result:
             l.append(int(x))
