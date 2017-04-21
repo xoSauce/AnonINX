@@ -85,6 +85,7 @@ class DbNode():
         return length
 
     def fetch_answer(self, msg):
+        print("here")
         try:
             db_cache = self.getRecords()['collection']
             pir_xor = msg['pir_xor']
@@ -94,7 +95,9 @@ class DbNode():
             else:
                 pir_executor = PIRExecutor()
                 vector = msg['index']
-                vector = self.decoder.decode_binary(vector)
+                print("Decoding")
+                vector = self.decoder.decode_binary(vector, len(db_cache))
+                print("Decoded")
                 message = ''
                 for i, val in enumerate(vector):
                     if val == 1:

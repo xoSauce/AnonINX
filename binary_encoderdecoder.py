@@ -15,21 +15,23 @@ class BinaryEncoderDecoder:
             string_conversion = string_conversion[self.size:]
             result.append(petlib_encode)
         return encode(result)
-    def decode_binary(self, e):
+
+    def decode_binary(self, e, record_size):
         e = decode(e)
         result = ""
         for x in e:
             petlib_decode = decode(x)
             binary = "{0:b}".format(petlib_decode)
-            result += binary
+            result += "0" * (record_size - len(binary)) + binary
         l = []
         for x in result:
             l.append(int(x))
         return l
+
 if __name__ == '__main__':
     enc = BinaryEncoderDecoder()
     array = [1,0,0,1] * 1000000
     encoding =  enc.encode_binary(array)
-    decoding = enc.decode_binary(encoding)
+    decoding = enc.decode_binary(encoding, 4000000)
     print(len(decoding), len(encoding))
     assert(decoding == array)

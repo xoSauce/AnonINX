@@ -3,7 +3,7 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
 from pir_executor import PIRExecutor
-
+from binary_encoderdecoder import BinaryEncoderDecoder
 def test_PIR_getMessagePack():
 	index = 1
 	size = 100
@@ -75,18 +75,16 @@ def test_PIR_protocol():
 		4: 'Fake4',
 		5: 'Fake5'
 	}
+	decoder = BinaryEncoderDecoder()
 	for index in range(0, len(messages)):
 		size = len(messages)
 		pir_executor = PIRExecutor()
 		m = pir_executor.getMessagePack(index, size, 5)
-		print('')
-		for i in m:
-			for j in i:
-				print(j, end='')
-			print('')
-		print('')
+
 		db_returns = []
 		for row in m:
+			row = decoder.decode_binary(row, len(messages))
+			print(row)
 			message = ''
 			for i in range(0, len(row)):
 				if row[i] == 1:

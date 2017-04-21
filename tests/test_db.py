@@ -5,6 +5,8 @@ sys.path.insert(0, myPath + '/../')
 from db import DbNode
 from unittest.mock import MagicMock
 from pir_executor import PIRExecutor
+from petlib.pack import encode
+from binary_encoderdecoder import BinaryEncoderDecoder
 def test_db():
     dbNode = DbNode({'database': 'tests/db_json'})
     requested_index = 2
@@ -12,8 +14,9 @@ def test_db():
     msg = {'pir_xor': False, 'index': requested_index}
     answer = dbNode.fetch_answer(msg)
     assert(answer == 'https://facebook.com\n')
-    vec = [1, 0, 1, 0, 1, 0, 0, 0, 0 ,0 ,1]
-    assert(len(vec) == 11)
+    encoder = BinaryEncoderDecoder()
+    vec = encoder.encode_binary([1,0,1,0,1,0,0,0,0,0,1])
+
     executor = PIRExecutor()
     array = ["https://google.com\n\n\n", "https://facebook.com\n", "https://alibaba.com\n\n", "https://improbable.i\n"]
     expected_result = array[0]

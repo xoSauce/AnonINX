@@ -86,13 +86,34 @@ import json
 import time
 import pickle
 from logger import log_info
-
+import threading
 class DbListenerHandler(RequestHandler):
     def setData(self, dbnode, mixport, callback_data=None):
         super().setData(callback_data)
         self.dbnode = dbnode
         self.mixport = mixport
         self.network_sender = NetworkSender()
+
+    def handle_PIR(self, decrypted_msg, client_pk):
+        t1 = time.perf_counter()
+        print("TRYING TO FETCH")
+        answer = self.dbnode.fetch_answer(decrypted_msg)
+        print("ANSWER:", answer)
+        reply = encode(answer)
+        encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
+        nymtuple = decrypted_msg['nymtuple']
+        first_node = decode(nymtuple[0])
+        header, delta = package_surb(
+                getGlobalSphinxParams(), nymtuple, encrypted_reply)
+        self.dbnode.get_mixnode_list()
+        json_data, dest = RequestCreator().post_msg_to_mix(
+                {'ip': first_node[1], 'port': self.mixport},
+                {'header': header, 'delta': delta}
+        )
+        t2 = time.perf_counter()
+        elapsed_time = (t2-t1)
+        log_info("TIME ELAPSED: {}".format(elapsed_time))
+        self.network_sender.send_data(json_data, dest)
 
     def handle_read(self):
         data = super().handle_read()
@@ -111,25 +132,9 @@ class DbListenerHandler(RequestHandler):
                 reply = encode(record_size)
                 self.socket.sendall(reply)
             elif request_type == RequestType.push_to_db.value:
-                t1 = time.perf_counter()
-                print("TRYING TO FETCH")
-                answer = self.dbnode.fetch_answer(decrypted_msg)
-                print("ANSWER:", answer)
-                reply = encode(answer)
-                encrypted_reply = encode(self.dbnode.encrypt(reply, client_pk))
-                nymtuple = decrypted_msg['nymtuple']
-                first_node = decode(nymtuple[0])
-                header, delta = package_surb(
-                        getGlobalSphinxParams(), nymtuple, encrypted_reply)
-                self.dbnode.get_mixnode_list()
-                json_data, dest = RequestCreator().post_msg_to_mix(
-                        {'ip': first_node[1], 'port': self.mixport},
-                        {'header': header, 'delta': delta}
-                )
-                t2 = time.perf_counter()
-                elapsed_time = (t2-t1)
-                log_info("TIME ELAPSED: {}".format(elapsed_time))
-                self.network_sender.send_data(json_data, dest)
+                pir_handler = threading.Thread(target=self.handle_PIR, args=(decrypted_msg,client_pk,), name="PIR handler")
+                pir_handler.daemon = True
+                pir_handler.start()
 
 
 class DBListener(asyncore.dispatcher):
