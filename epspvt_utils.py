@@ -10,16 +10,16 @@ class ProtocolNumber():
     PROTOCOL_BYTE_NUMBER = 15
 
 class SecurityParameters():
-    NUMBER_OF_REQUESTS = 6 # p in the paper
+    NUMBER_OF_REQUESTS = 16 # p in the paper
     REQUESTS_IN_THE_POOL = 3
-    SPARSITY_FACTOR = 0.2
+    SPARSITY_FACTOR = 0.3
     NUMBER_OF_MIXES = 5 ##selection of number of mixes
     # theta sparsity factor
     # corrupt databases
     #
 
 def getGlobalSphinxParams():
-    return SphinxParams(header_len = 500, body_len=4096)
+    return SphinxParams(header_len = 500, body_len=4096*50)
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()

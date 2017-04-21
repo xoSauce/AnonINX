@@ -6,7 +6,7 @@ from functools import reduce
 from numpy import median
 
 times = []
-ip = '52.212.198.48'
+ip = '54.72.217.72'
 class Runner(threading.Thread):
     def __init__(self, index):
         self.index =index
@@ -38,7 +38,7 @@ def print_statistics(avg, maximum, minimum, median):
 
 if __name__ == '__main__':
     print("REMEMBER TO SET NEW IP OF BROKER !! Current IP {}".format(ip))
-    limit = 50
+    limit = 30
     clients = 150
     threadAlive = set()
     threadInactive = set()
