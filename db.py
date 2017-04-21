@@ -7,6 +7,7 @@ from binascii import unhexlify
 from pir_executor import PIRExecutor
 import json
 import os
+from binary_encoderdecoder import BinaryEncoderDecoder
 class DbNode():
 
     def _get_mixnode_list(self):
@@ -37,6 +38,7 @@ class DbNode():
         self.broker_comm = BrokerCommunicator()
         self.records = {}
         self.loadRecords()
+        self.decoder = BinaryEncoderDecoder()
 
     def loadRecords(self):
         path = self.broker_config['database']
@@ -92,7 +94,7 @@ class DbNode():
             else:
                 pir_executor = PIRExecutor()
                 vector = msg['index']
-                print(vector)
+                vector = self.decoder.decode_binary(vector)
                 message = ''
                 for i, val in enumerate(vector):
                     if val == 1:

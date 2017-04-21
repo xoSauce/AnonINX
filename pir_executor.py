@@ -1,8 +1,11 @@
 from random import random, uniform
 from epspvt_utils import SecurityParameters
+from binary_encoderdecoder import BinaryEncoderDecoder
 import array
+
 class PIRExecutor():
     def __init__(self):
+        self.encoder = BinaryEncoderDecoder()
         pass
 
     def _getRandomBernouille(self, random_gen):
@@ -65,4 +68,4 @@ class PIRExecutor():
 
     def getMessagePack(self, index, size, dbnum):
         ## return a transposed list of messages, ready to be sent
-        return [list(i) for i in zip(*self._getMessagePack(index,size, dbnum))]
+        return [self.encoder.encode_binary(list(i)) for i in zip(*self._getMessagePack(index,size, dbnum))]

@@ -15,7 +15,7 @@ from petlib.pack import encode, decode
 from client_poller import ClientPoller
 from pir_executor import PIRExecutor
 from message_creator import MessageCreator
-
+from pickle import dumps
 
 class Client:
     def __init__(self, public_key_server):
@@ -33,9 +33,9 @@ class Client:
             msg, key, session_name
         )
         e_message = {
-            'pk': hexlify(g_x.export()).decode('utf-8'), 'iv': hexlify(iv).decode('utf-8'), 'text': hexlify(ciphertext).decode('utf-8'), 'tag': hexlify(tag).decode('utf-8')
+            'pk': g_x.export(), 'iv': iv, 'text': ciphertext, 'tag': tag
         }
-        json_msg = json.dumps(e_message, ensure_ascii=False)
+        json_msg = dumps(e_message)
         return (json_msg)
 
     def getDBRecordSize(self, portEnum, network_sender):

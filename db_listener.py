@@ -84,6 +84,7 @@ import socket
 import asyncore
 import json
 import time
+import pickle
 from logger import log_info
 
 class DbListenerHandler(RequestHandler):
@@ -96,12 +97,12 @@ class DbListenerHandler(RequestHandler):
     def handle_read(self):
         data = super().handle_read()
         if data:
-            data = json.loads(data.decode())
-            iv = unhexlify(data["iv"].encode())
-            text = unhexlify(data["text"].encode())
+            data = pickle.loads(data)
+            iv = data["iv"]
+            text = data["text"]
             pk = EcPt.from_binary(
-                    unhexlify(data["pk"].encode()), getGlobalSphinxParams().group.G)
-            tag = unhexlify(data["tag"].encode())
+                    data["pk"], getGlobalSphinxParams().group.G)
+            tag = data["tag"]
             decrypted_msg = decode(self.dbnode.decrypt(iv, text, pk, tag))
             request_type = decrypted_msg['request_type']
             client_pk = decrypted_msg['pk'][2]
