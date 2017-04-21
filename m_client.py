@@ -56,7 +56,10 @@ class Client:
         message = messages[0]
         for m in messages[1:]:
             message = pir_executor.stringXorer(message, m)
-        return message.decode().strip()
+        if len(messages) > 1:
+            return message.decode().strip()
+        else:
+            return message.strip()
 
     def decrypt(self, cipher, private_key):
         iv = cipher['iv']
@@ -208,6 +211,7 @@ class Client:
             message['nymtuple'] = nymtuple
             message = encode(message)
             json_msg = self.encryptForDB(message, key, self.session_name)
+            print(json_msg, len(json_msg))
             header, delta = create_forward_message(params,
                                                    nodes_routing_forward,
                                                    pks_chosen_nodes_forward,

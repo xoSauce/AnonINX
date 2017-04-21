@@ -4,7 +4,7 @@ from enum import Enum
 from epspvt_utils import Debug
 from petlib.pack import encode
 import json
-
+import pickle
 class RequestType(Enum):
     publish_mix_data = 1
     publish_db_data = 2
@@ -63,9 +63,9 @@ class RequestCreator():
     def post_msg_to_mix(self, destination, data):
         request = {
                 'type': RequestType.push_to_mix.value,
-                'payload': hexlify(encode(data)).decode('utf-8')
+                'payload': encode(data)
         }
-        data_string = json.dumps(request)
+        data_string = pickle.dumps(request)
         serialized_destination = {
                 'ip': destination['ip'],
                 'port': int(destination['port'])
@@ -130,11 +130,11 @@ class RequestCreator():
             enumPort = PortEnumDebug
         json_dict = {
                 'type': RequestType.client_poll.value,
-                'id': hexlify(id).decode('utf-8')
+                'id': id
         }
         serialized_destination = {
                 'ip': destination,
                 'port': int(enumPort.mix.value)
         }
-        data_string = json.dumps(json_dict)
+        data_string = pickle.dumps(json_dict)
         return (data_string, serialized_destination)

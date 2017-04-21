@@ -28,6 +28,7 @@ from sphinxmix.SphinxClient import Relay_flag, Dest_flag, Surb_flag
 from RequestHandlerAsyncore import RequestHandler
 from binascii import unhexlify
 from network_sender import NetworkSender
+import pickle
 #
 #
 # class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -123,11 +124,12 @@ class MixListenerHandler(RequestHandler):
     def handle_read(self):
         data = super().handle_read()
         if data:
-            data = json.loads(data.decode())
+            print(data[:100])
+            data = pickle.loads(data)
             if data['type'] == RequestType.push_to_mix.value:
                 start = time.time()
                 operation = ''
-                data = decode(unhexlify(data['payload']))
+                data = decode(data['payload'])
                 header = data['header']
                 delta = data['delta']
                 result = self.mixnode.process(header, delta)
@@ -157,7 +159,7 @@ class MixListenerHandler(RequestHandler):
                 logger.log_info(
                     '[TIME] MIX LISTENER {} TOOK {}'.format(operation, timestamp))
             elif data['type'] == RequestType.client_poll.value:
-                client_id = unhexlify(data['id'])
+                client_id = data['id']
                 with self.backlog_lock:
                     self.mixnode.client_backlog.add((client_id, self.socket))
 
