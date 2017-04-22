@@ -22,7 +22,6 @@ class BinaryEncoderDecoder:
         for x in e[:-1]:
             petlib_decode = decode(x)
             binary = "{0:b}".format(petlib_decode)
-            print("BINARY", binary)
             pad = "0" * (min(self.size, record_size) - len(binary))
             result += pad + binary
         petlib_decode = decode(e[-1])
