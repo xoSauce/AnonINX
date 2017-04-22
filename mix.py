@@ -35,7 +35,6 @@ class MixNode():
                 # print("POOL SIZE: {}".format(len(self.mix_pool.getContents())))
                 items_to_send = self.mix_pool.getSelection()
             for entry in items_to_send:
-                print("RELAYING {}".format(len(items_to_send)))
                 json_data, destination = entry
                 if Debug.dbg:
                     destination['ip'] = '0.0.0.0'

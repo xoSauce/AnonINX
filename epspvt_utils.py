@@ -12,7 +12,7 @@ class ProtocolNumber():
 class SecurityParameters():
     NUMBER_OF_REQUESTS = 16 # p in the paper
     REQUESTS_IN_THE_POOL = 3
-    SPARSITY_FACTOR = 0.3
+    SPARSITY_FACTOR = 0.4
     NUMBER_OF_MIXES = 5 ##selection of number of mixes
     # theta sparsity factor
     # corrupt databases
