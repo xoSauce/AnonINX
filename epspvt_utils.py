@@ -19,7 +19,7 @@ class SecurityParameters():
     #
 
 def getGlobalSphinxParams():
-    return SphinxParams(header_len = 1024, body_len=1024*100)
+    return SphinxParams(header_len = 1024, body_len=1024*20)
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
