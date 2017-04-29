@@ -33,7 +33,7 @@ class Encryptor():
         _, aes_private_key = self.keyGenerate(session)
         x = aes_private_key[1]
         g_x = aes_private_key[2]
-        e_key = hexlify(self.G.expon(public_key, x).export())
+        e_key = self.G.expon(public_key, x).export()
         e_key = sha256(e_key).digest()[:16]
         ciphertext, tag = aes.quick_gcm_enc(e_key, iv, msg)
         return (g_x, iv, ciphertext, tag)
@@ -41,7 +41,7 @@ class Encryptor():
     def decrypt_aes_gcm(self, msg, secret):
         aes = Cipher.aes_128_gcm()
         g_x, iv, ciphertext, tag = msg
-        d_key = hexlify(self.G.expon(g_x, secret).export())
+        d_key = self.G.expon(g_x, secret).export()
         d_key = sha256(d_key).digest()[:16]
         msg = aes.quick_gcm_dec(d_key, iv, ciphertext, tag)
         return msg
