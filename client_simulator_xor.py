@@ -5,7 +5,7 @@ import random
 from functools import reduce
 from numpy import median
 
-ip = '54.72.217.72'
+ip = '54.72.59.68'
 times = []
 class Runner(threading.Thread):
     def __init__(self, index):
@@ -15,7 +15,7 @@ class Runner(threading.Thread):
     def run(self):
         i = self.index
         startTime = time.time()
-        response = subprocess.check_call(['python3', '/home/xosauce/UCL/mproject/m_client.py', ip, '8080', '-i', str(i), '-db', '0', '-x'], stdout=subprocess.DEVNULL)
+        response = subprocess.check_call(['python3', '/home/xosauce/UCL/mproject/m_client.py', ip, '-i', str(i), '-db', '0', '-x'], stdout=subprocess.DEVNULL)
         endTime = time.time() - startTime
         times.append(endTime)
         print("Finished with code {}".format(response))
@@ -39,7 +39,7 @@ def print_statistics(avg, maximum, minimum, median):
 if __name__ == '__main__':
     print("REMEMBER TO SET NEW IP OF BROKER !! Current IP {}".format(ip))
     limit = 50
-    clients = 10
+    clients = 20
     threadAlive = set()
     threadInactive = set()
 
