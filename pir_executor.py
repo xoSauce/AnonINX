@@ -1,4 +1,4 @@
-from random import random, uniform
+from random import SystemRandom, uniform
 from epspvt_utils import SecurityParameters
 from binary_encoderdecoder import BinaryEncoderDecoder
 import array
@@ -9,7 +9,7 @@ class PIRExecutor():
         pass
 
     def _getRandomBernouille(self, random_gen):
-        r = random()
+        r = SystemRandom().random()
         if r < random_gen:
             return 1
         return 0
