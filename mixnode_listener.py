@@ -124,7 +124,6 @@ class MixListenerHandler(RequestHandler):
     def handle_read(self):
         data = super().handle_read()
         if data:
-            print(data[:100])
             data = pickle.loads(data)
             if data['type'] == RequestType.push_to_mix.value:
                 start = time.time()

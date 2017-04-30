@@ -88,13 +88,16 @@ import pickle
 from logger import log_info
 import threading
 class DbListenerHandler(RequestHandler):
-    def setData(self, dbnode, mixport, callback_data=None):
+    def setData(self, dbnode, mixport, t_accepted, callback_data=None):
         super().setData(callback_data)
         self.dbnode = dbnode
         self.mixport = mixport
         self.network_sender = NetworkSender()
+        self.t_accepted = t_accepted
 
     def handle_PIR(self, decrypted_msg, client_pk):
+        time_queued = time.perf_counter() - self.t_accepted
+        log_info(">>>>> TIME QUEUED: {}".format(time_queued))
         t1 = time.perf_counter()
         print("TRYING TO FETCH")
         answer = self.dbnode.fetch_answer(decrypted_msg)
@@ -150,6 +153,7 @@ class DBListener(asyncore.dispatcher):
     def handle_accept(self):
         pair = self.accept()
         if pair is not None:
+            t_accepted = time.perf_counter()
             sock, addr = pair
             handler = DbListenerHandler(sock)
-            handler.setData(self.dbnode, self.mixport)
+            handler.setData(self.dbnode, self.mixport, t_accepted)

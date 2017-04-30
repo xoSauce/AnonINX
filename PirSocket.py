@@ -16,13 +16,13 @@ class PIRSocket(object):
         return self._protocolByteNumber
 
     def _construct_message(self, msg):
-        return (len(msg)).to_bytes(15, byteorder='big') + msg
+        return (len(msg)).to_bytes(self._protocolByteNumber, byteorder='big') + msg
 
     def send(self, msg):
         return self.sendall(msg)
 
     def sendall(self, msg):
-        msg = self._construct_message(msg)#
+        msg = self._construct_message(msg)
         try:
             self._sock.sendall(msg)
         except OSError:

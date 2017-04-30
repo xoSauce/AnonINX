@@ -254,8 +254,7 @@ def parse():
                         help="Use vector xoring method")
     parser.add_argument(
         'pkserver', help="Specify the public IP address of the server where public keys will be stored.")
-    parser.add_argument(
-        'port', help="Specify the port where the server is listening for connections")
+
     parser.add_argument('-i', '--requested_index',
                         help="Specify the index to retrieve")
     parser.add_argument(
