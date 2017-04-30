@@ -1,4 +1,7 @@
-# Lower-Cost-epsilon-Private-Information-Retrieval
+# AnonINX
+AnonINX is an anonymity system implemented as part requirement for the MEng Degree in Computer Science at UCL.
+It is substantially the result of my own work except where explicitly indicated in the accompanying report.
+
 ### User Manual
 To install AnonINX, clone the repository and run:
 ```sh
